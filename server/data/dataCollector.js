@@ -7,7 +7,7 @@ const CONFIG = {
   // Very conservative intervals to respect Sentiweb
   COLLECTION_INTERVAL_HOURS: 24, // Once per day
   MAX_RECORDS_PER_REQUEST: 10, // Small batches
-  CSV_FILE_PATH: path.join(__dirname, "sentiweb_data.csv"),
+  CSV_FILE_PATH: path.join(__dirname, "../../incidence.csv"),
   BACKUP_INTERVAL_HOURS: 168, // Weekly backups
 };
 
@@ -25,7 +25,6 @@ class SentiwebDataCollector {
       "inc100_up",
       "geo_insee",
       "geo_name",
-      "collected_at",
     ];
     this.initializeCSV();
   }
@@ -126,8 +125,14 @@ class SentiwebDataCollector {
 
       if (lines.length <= 1) return []; // Only headers
 
-      const headers = lines[0].split(",");
-      const records = lines.slice(1).map((line) => {
+      // Skip metadata line if it starts with "#"
+      let headerIndex = 0;
+      if (lines[0].startsWith("#")) {
+        headerIndex = 1;
+      }
+
+      const headers = lines[headerIndex].split(",");
+      const records = lines.slice(headerIndex + 1).map((line) => {
         const values = line.split(",");
         const record = {};
         headers.forEach((header, index) => {
