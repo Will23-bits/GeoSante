@@ -20,6 +20,11 @@ interface Department {
   riskScore: number;
   riskLevel: string;
   vaccinationCoverage?: number;
+  fluCoverage?: number;
+  covidCoverage?: number;
+  hpvCoverage?: number;
+  meningococcalCoverage?: number;
+  vaccinationRiskLevel?: string;
   emergencyVisits?: number;
   sosMedecinsActs?: number;
   population?: number;
@@ -241,16 +246,79 @@ function Dashboard() {
                       </div>
                     </div>
                     {selectedDepartment.vaccinationCoverage && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">
-                          Couverture Vaccinale :
-                        </span>
-                        <span className="font-mono text-sm">
-                          {(
-                            selectedDepartment.vaccinationCoverage * 100
-                          ).toFixed(1)}
-                          %
-                        </span>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">
+                            Couverture Vaccinale Globale :
+                          </span>
+                          <span className="font-mono text-sm">
+                            {(
+                              selectedDepartment.vaccinationCoverage * 100
+                            ).toFixed(1)}
+                            %
+                          </span>
+                        </div>
+                        {selectedDepartment.fluCoverage && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-blue-700">
+                              Vaccination Grippe :
+                            </span>
+                            <span className="font-mono text-sm text-blue-600">
+                              {(selectedDepartment.fluCoverage * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                        {selectedDepartment.covidCoverage && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-green-700">
+                              Vaccination COVID-19 :
+                            </span>
+                            <span className="font-mono text-sm text-green-600">
+                              {(selectedDepartment.covidCoverage * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                        {selectedDepartment.hpvCoverage && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-purple-700">
+                              Vaccination HPV :
+                            </span>
+                            <span className="font-mono text-sm text-purple-600">
+                              {(selectedDepartment.hpvCoverage * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                        {selectedDepartment.meningococcalCoverage && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-orange-700">
+                              Vaccination Méningocoque C :
+                            </span>
+                            <span className="font-mono text-sm text-orange-600">
+                              {(selectedDepartment.meningococcalCoverage * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
+                        {selectedDepartment.vaccinationRiskLevel && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Risque Vaccinal :</span>
+                            <Badge
+                              variant={
+                                selectedDepartment.vaccinationRiskLevel === "very-high"
+                                  ? "destructive"
+                                  : selectedDepartment.vaccinationRiskLevel === "high"
+                                    ? "secondary"
+                                    : selectedDepartment.vaccinationRiskLevel === "medium"
+                                      ? "outline"
+                                      : "default"
+                              }
+                              className="text-xs"
+                            >
+                              {selectedDepartment.vaccinationRiskLevel === "very-high" ? "Très Élevé" :
+                                selectedDepartment.vaccinationRiskLevel === "high" ? "Élevé" :
+                                  selectedDepartment.vaccinationRiskLevel === "medium" ? "Moyen" : "Faible"}
+                            </Badge>
+                          </div>
+                        )}
                       </div>
                     )}
                     {selectedDepartment.emergencyVisits && (

@@ -1,20 +1,74 @@
 const express = require("express");
 const router = express.Router();
-const { Mistral } = require("@mistralai/mistralai");
+const { spawn } = require("child_process");
 const { processData } = require("../data/fetchData");
+const VaccinationDataParser = require("../data/vaccinationData");
 
-const client = new Mistral({
-  apiKey: process.env.MISTRAL_API_KEY || "your-mistral-api-key",
-});
+// Initialize vaccination data parser
+const vaccinationParser = new VaccinationDataParser();
 
-// RAG knowledge base from real Sentiweb data
+// Ollama configuration for local AI inference
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.2:3b";
+
+/**
+ * Query Ollama model locally
+ */
+async function queryOllama(message, knowledgeBase) {
+  return new Promise((resolve, reject) => {
+    const systemPrompt = `Vous êtes un assistant spécialisé dans l'analyse des données de santé publique française, particulièrement les risques de grippe et la couverture vaccinale par département. Vous répondez uniquement en français et utilisez les données exactes fournies.
+
+Données disponibles: ${JSON.stringify(knowledgeBase, null, 2)}
+
+Répondez en français, soyez précis et utilisez les données fournies.`;
+
+    const fullPrompt = `${systemPrompt}\n\nQuestion: ${message}\n\nRéponse:`;
+
+    const ollama = spawn("ollama", ["run", OLLAMA_MODEL, fullPrompt]);
+
+    let response = "";
+    let errorOutput = "";
+
+    ollama.stdout.on("data", (data) => {
+      response += data.toString();
+    });
+
+    ollama.stderr.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+
+    ollama.on("close", (code) => {
+      if (code === 0) {
+        resolve(response.trim());
+      } else {
+        console.error("Ollama error:", errorOutput);
+        reject(
+          new Error(`Ollama process exited with code ${code}: ${errorOutput}`)
+        );
+      }
+    });
+
+    ollama.on("error", (error) => {
+      reject(error);
+    });
+
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      ollama.kill();
+      reject(new Error("Ollama query timeout"));
+    }, 30000);
+  });
+}
+
+// RAG knowledge base from real Sentiweb data + vaccination data
 async function buildKnowledgeBase() {
   // Fetch real data from Sentiweb via processData
   const { processData } = require("../data/fetchData");
   let departments;
+  let vaccinationStats;
 
   try {
     departments = await processData();
+    vaccinationStats = await vaccinationParser.getVaccinationStatistics();
   } catch (error) {
     console.error(
       "[ChatBot] Error fetching real data, using fallback:",
@@ -28,6 +82,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.3,
         riskLevel: "low",
         vaccinationCoverage: 0.65,
+        fluCoverage: 0.62,
+        covidCoverage: 0.58,
         emergencyVisits: 1200,
       },
       {
@@ -36,6 +92,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.8,
         riskLevel: "high",
         vaccinationCoverage: 0.45,
+        fluCoverage: 0.42,
+        covidCoverage: 0.38,
         emergencyVisits: 8500,
       },
       {
@@ -44,6 +102,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.6,
         riskLevel: "medium",
         vaccinationCoverage: 0.55,
+        fluCoverage: 0.52,
+        covidCoverage: 0.48,
         emergencyVisits: 3200,
       },
       {
@@ -52,6 +112,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.7,
         riskLevel: "high",
         vaccinationCoverage: 0.5,
+        fluCoverage: 0.47,
+        covidCoverage: 0.44,
         emergencyVisits: 4100,
       },
       {
@@ -60,6 +122,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.4,
         riskLevel: "low",
         vaccinationCoverage: 0.6,
+        fluCoverage: 0.57,
+        covidCoverage: 0.53,
         emergencyVisits: 1800,
       },
       {
@@ -68,6 +132,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.5,
         riskLevel: "medium",
         vaccinationCoverage: 0.58,
+        fluCoverage: 0.55,
+        covidCoverage: 0.51,
         emergencyVisits: 2800,
       },
       {
@@ -76,6 +142,8 @@ async function buildKnowledgeBase() {
         riskScore: 0.2,
         riskLevel: "very-low",
         vaccinationCoverage: 0.7,
+        fluCoverage: 0.67,
+        covidCoverage: 0.63,
         emergencyVisits: 900,
       },
       {
@@ -84,10 +152,26 @@ async function buildKnowledgeBase() {
         riskScore: 0.9,
         riskLevel: "high",
         vaccinationCoverage: 0.4,
+        fluCoverage: 0.37,
+        covidCoverage: 0.34,
         emergencyVisits: 5200,
       },
     ];
     departments = mockDepartments;
+    vaccinationStats = {
+      totalDepartments: 8,
+      averageCoverage: 0.55,
+      lowCoverageDepartments: [
+        { name: "Alpes-Maritimes", code: "06", coverage: 0.4 },
+        { name: "Paris", code: "75", coverage: 0.45 },
+      ],
+      highCoverageDepartments: [
+        { name: "Bas-Rhin", code: "67", coverage: 0.7 },
+        { name: "Haute-Garonne", code: "31", coverage: 0.6 },
+      ],
+      coverageDistribution: { veryHigh: 1, high: 2, medium: 3, low: 2 },
+      latestYear: new Date().getFullYear(),
+    };
   }
 
   const stats = {
@@ -113,14 +197,11 @@ async function buildKnowledgeBase() {
   };
 
   return `
-Base de Connaissances des Données de Risque de Grippe en France (Source: Sentiweb):
+Base de Connaissances des Données de Santé en France (Sources: Sentiweb + Couvertures Vaccinales):
+
+=== DONNÉES DE RISQUE DE GRIPPE ===
 - Total départements analysés: ${stats.totalDepartments}
 - Score de risque moyen: ${stats.averageRiskScore.toFixed(2)}
-- Couverture vaccinale moyenne: ${
-    stats.averageVaccinationCoverage > 0
-      ? (stats.averageVaccinationCoverage * 100).toFixed(1) + "%"
-      : "Non disponible"
-  }
 - Départements à haut risque: ${
     stats.highRiskDepartments.length > 0
       ? stats.highRiskDepartments.join(", ")
@@ -133,36 +214,74 @@ Base de Connaissances des Données de Risque de Grippe en France (Source: Sentiw
       : "Aucun"
   }
 
-Détails des Départements (échantillon):
+=== DONNÉES DE COUVERTURE VACCINALE ===
+- Couverture vaccinale moyenne: ${
+    vaccinationStats.averageCoverage > 0
+      ? (vaccinationStats.averageCoverage * 100).toFixed(1) + "%"
+      : "Non disponible"
+  }
+- Année des données: ${vaccinationStats.latestYear}
+- Départements avec faible couverture (< 50%): ${
+    vaccinationStats.lowCoverageDepartments.length > 0
+      ? vaccinationStats.lowCoverageDepartments
+          .slice(0, 5)
+          .map((d) => `${d.name} (${(d.coverage * 100).toFixed(1)}%)`)
+          .join(", ")
+      : "Aucun"
+  }
+- Départements avec bonne couverture (≥ 70%): ${
+    vaccinationStats.highCoverageDepartments.length > 0
+      ? vaccinationStats.highCoverageDepartments
+          .slice(0, 5)
+          .map((d) => `${d.name} (${(d.coverage * 100).toFixed(1)}%)`)
+          .join(", ")
+      : "Aucun"
+  }
+
+=== DÉTAILS DES DÉPARTEMENTS (échantillon) ===
 ${departments
   .slice(0, 15)
   .map((dept) => {
     const vacc = dept.vaccinationCoverage
       ? `${(dept.vaccinationCoverage * 100).toFixed(1)}%`
       : "N/D";
+    const flu = dept.fluCoverage
+      ? `${(dept.fluCoverage * 100).toFixed(1)}%`
+      : "N/D";
+    const covid = dept.covidCoverage
+      ? `${(dept.covidCoverage * 100).toFixed(1)}%`
+      : "N/D";
     const emerg = dept.emergencyVisits ? String(dept.emergencyVisits) : "N/D";
     return `${dept.name} (${dept.code}): Risque ${dept.riskScore.toFixed(2)} (${
       dept.riskLevel
-    }), Vaccination ${vacc}, Urgences ${emerg}`;
+    }), Vaccination ${vacc}, Grippe ${flu}, COVID ${covid}, Urgences ${emerg}`;
   })
   .join("\n")}
 
-Source des Données:
+=== SOURCES DES DONNÉES ===
 - Risques de grippe: API Sentiweb (données régionales appliquées aux départements)
-- Calcul: Intensité basée sur l'incidence pour 100k habitants sur les 5 dernières années
+- Couvertures vaccinales: Données officielles françaises (CSV)
+- Calcul grippe: Intensité basée sur l'incidence pour 100k habitants sur les 5 dernières années
+- Vaccinations: HPV, Méningocoque C, Grippe, COVID-19 par tranches d'âge
 - Mise à jour: Automatique avec cache d'1 heure pour respecter les limites de taux
 
-Niveaux de Risque:
+=== NIVEAUX DE RISQUE ===
 - Très Faible: 0.0 - 0.3
 - Faible: 0.3 - 0.5  
 - Moyen: 0.5 - 0.7
 - Élevé: 0.7 - 1.0
 
-Note: Les données proviennent de l'API Sentiweb officielle avec système de rate limiting et cache pour éviter les blocages.
+=== NIVEAUX DE COUVERTURE VACCINALE ===
+- Très Élevé: ≥ 70% (risque faible)
+- Élevé: 50-69% (risque moyen)
+- Faible: 30-49% (risque élevé)
+- Très Faible: < 30% (risque très élevé)
+
+Note: Les données proviennent des APIs officielles avec système de rate limiting et cache pour éviter les blocages.
 `;
 }
 
-// POST /api/chat - Chat with AI about flu risk data
+// POST /api/chat - Chat with Ollama about flu risk data
 router.post("/", async (req, res) => {
   try {
     const { message } = req.body;
@@ -173,38 +292,16 @@ router.post("/", async (req, res) => {
 
     const knowledgeBase = await buildKnowledgeBase();
 
-    const prompt = `
-Vous êtes un analyste de données de santé spécialisé dans l'évaluation du risque de grippe en France.
-Utilisez les données suivantes pour répondre aux questions sur les zones à risque de grippe, la couverture vaccinale et les prédictions.
+    // Use local Ollama model
+    console.log(`🤖 Using Ollama model: ${OLLAMA_MODEL}`);
 
-${knowledgeBase}
-
-Question de l'utilisateur: ${message}
-
-IMPORTANT: Répondez UNIQUEMENT en français. Soyez concis et utile basé sur les données ci-dessus. Gardez les réponses sous 200 mots et utilisez un formatage clair. Si on vous demande des prédictions, utilisez les tendances et modèles des données pour faire des prévisions raisonnables.
-
-Formatez votre réponse comme suit:
-- Utilisez des puces pour les listes
-- Utilisez **gras** pour les noms de départements et métriques clés
-- Gardez les prédictions brèves et actionables
-- Terminez par un résumé clair ou une recommandation
-`;
-
-    const response = await client.chat.complete({
-      model: "ministral-3b-latest",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      maxTokens: 300, // Reduced to prevent cutoff
-      temperature: 0.7,
-    });
+    const response = await queryOllama(message, knowledgeBase);
 
     res.json({
-      response: response.choices?.[0]?.message?.content || "",
+      response: response,
       timestamp: new Date().toISOString(),
+      model: OLLAMA_MODEL,
+      provider: "ollama",
     });
   } catch (error) {
     console.error("Error in chatbot:", error);

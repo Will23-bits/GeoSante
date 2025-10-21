@@ -21,6 +21,11 @@ interface Department {
   riskScore: number;
   riskLevel: string;
   vaccinationCoverage?: number;
+  fluCoverage?: number;
+  covidCoverage?: number;
+  hpvCoverage?: number;
+  meningococcalCoverage?: number;
+  vaccinationRiskLevel?: string;
   emergencyVisits?: number;
   sosMedecinsActs?: number;
   population?: number;
@@ -176,32 +181,34 @@ function DepartmentsChoropleth({ departments }: { departments: Department[] }) {
           const name = props.nom || props.nom_dep || (d as any)?.name || "Département";
 
           if (d) {
-            const vacc =
-              typeof (d as any).vaccinationCoverage === "number"
-                ? `${((d as any).vaccinationCoverage * 100).toFixed(1)}%`
-                : null;
-            const emerg =
-              typeof (d as any).emergencyVisits === "number"
-                ? String((d as any).emergencyVisits)
-                : null;
-
-            const extra = `
-              ${vacc
-                ? `<p><strong>Vaccination Coverage:</strong> ${vacc}</p>`
-                : ""
-              }
-              ${emerg
-                ? `<p><strong>Emergency Visits:</strong> ${emerg}</p>`
-                : ""
-              }
+            // Flu risk data (from sentiweb_data.csv)
+            const fluData = `
+              <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+                <h4 style="margin: 0 0 8px 0; color: #2c3e50;">🦠 Flu Risk Data</h4>
+                <p style="margin: 2px 0;"><strong>Risk Level:</strong> ${(d as any).riskLevel}</p>
+                <p style="margin: 2px 0;"><strong>Risk Score:</strong> ${((d as any).riskScore * 100).toFixed(1)}%</p>
+              </div>
             `;
+
+            // Vaccination data (from couvertures-vaccinales CSV) - only flu coverage
+            const fluVacc = (d as any).fluCoverage !== undefined && (d as any).fluCoverage !== null
+              ? `${(((d as any).fluCoverage) * 100).toFixed(1)}%`
+              : null;
+
+            const vaccinationData = fluVacc
+              ? `
+                <div style="margin-bottom: 15px;">
+                  <h4 style="margin: 0 0 8px 0; color: #27ae60;">💉 Vaccination Coverage</h4>
+                  <p style="margin: 2px 0;"><strong>Flu Vaccination:</strong> ${fluVacc}</p>
+                </div>
+              `
+              : "";
 
             layer.bindPopup(`
               <div>
                 <h3>${name} (${code})</h3>
-                <p><strong>Risk Level:</strong> ${(d as any).riskLevel}</p>
-                <p><strong>Risk Score:</strong> ${(d as any).riskScore}</p>
-                ${extra}
+                ${fluData}
+                ${vaccinationData}
               </div>
             `);
           } else {
@@ -274,72 +281,11 @@ function DepartmentMarkers({ departments, onDepartmentClick }: { departments: De
           "988", // Nouvelle-Calédonie
         ].includes(String(code));
 
-      // Mainland France markers
-      const mainlandMarkers = departments
-        .filter((dept) => !isOverseas(dept.code))
-        .filter(
-          (dept) => Number.isFinite(dept?.lat) && Number.isFinite(dept?.lng)
-        )
-        .map((dept) => {
-          const marker = L.circleMarker([dept.lat!, dept.lng!], {
-            radius: 8,
-            fillColor: getRiskColor((dept as any).riskLevel),
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-          });
+      // Mainland France markers - removed dots, keeping only popup functionality
+      const mainlandMarkers: any[] = [];
 
-          marker.bindPopup(`
-          <div>
-            <h3>${dept.name}</h3>
-            <p><strong>Risk Level:</strong> ${(dept as any).riskLevel}</p>
-            <p><strong>Risk Score:</strong> ${(dept as any).riskScore}</p>
-            <p><strong>Vaccination Coverage:</strong> ${(
-              (dept as any).vaccinationCoverage * 100
-            ).toFixed(1)}%</p>
-            <p><strong>Emergency Visits:</strong> ${(dept as any).emergencyVisits}</p>
-          </div>
-        `);
-
-          marker.on("click", () => onDepartmentClick(dept));
-
-          return marker;
-        });
-
-      // Overseas territories markers (DOM-TOM)
-      const overseasMarkers = departments
-        .filter((dept) => isOverseas(dept.code))
-        .filter(
-          (dept) => Number.isFinite(dept?.lat) && Number.isFinite(dept?.lng)
-        )
-        .map((dept) => {
-          const marker = L.circleMarker([dept.lat!, dept.lng!], {
-            radius: 10,
-            fillColor: getRiskColor((dept as any).riskLevel),
-            color: "#000",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8,
-          });
-
-          marker.bindPopup(`
-          <div>
-            <h3>${dept.name} (${dept.code})</h3>
-            <p><strong>Risk Level:</strong> ${(dept as any).riskLevel}</p>
-            <p><strong>Risk Score:</strong> ${(dept as any).riskScore}</p>
-            <p><strong>Vaccination Coverage:</strong> ${(
-              (dept as any).vaccinationCoverage * 100
-            ).toFixed(1)}%</p>
-            <p><strong>Emergency Visits:</strong> ${(dept as any).emergencyVisits}</p>
-            <p class="text-xs text-blue-700 font-semibold">Territoire d'Outre-Mer</p>
-          </div>
-        `);
-
-          marker.on("click", () => onDepartmentClick(dept));
-
-          return marker;
-        });
+      // Overseas territories markers (DOM-TOM) - removed dots, keeping only popup functionality
+      const overseasMarkers: any[] = [];
 
       if (mainlandMarkers.length === 0 && overseasMarkers.length === 0) return () => { };
 
@@ -428,19 +374,21 @@ function DepartmentMarkers({ departments, onDepartmentClick }: { departments: De
 //   return null;
 // }
 
-// Get color based on risk level
+// Get color based on risk level (optimized for 30-50% range)
 function getRiskColor(riskLevel: string) {
   switch (riskLevel) {
-    case "very-low":
-      return "#4CAF50"; // Green
     case "low":
-      return "#8BC34A"; // Light Green
+      return "#2E7D32"; // Dark Green (< 30%)
+    case "low-medium":
+      return "#4CAF50"; // Green (30-35%)
     case "medium":
-      return "#FFC107"; // Yellow
+      return "#8BC34A"; // Light Green (35-40%)
+    case "medium-high":
+      return "#FFC107"; // Yellow (40-45%)
     case "high":
-      return "#FF9800"; // Orange
+      return "#FF9800"; // Orange (>= 45%)
     default:
-      return "#F44336"; // Red
+      return "#F44336"; // Red (fallback)
   }
 }
 
@@ -555,24 +503,32 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
       </MapContainer>
 
       {/* Compact Legend */}
-      <Card className="absolute top-4 right-4 z-[1000] w-40 bg-white/95 backdrop-blur-sm shadow-lg border-gray-200">
+      <Card className="absolute top-4 right-4 z-[1000] w-48 bg-white/95 backdrop-blur-sm shadow-lg border-gray-200">
         <CardHeader className="pb-2 pt-2 border-b border-gray-100">
           <CardTitle className="text-xs text-gray-900 font-bold uppercase tracking-wide">
-            Légende
+            Légende Risque
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 pb-3 pt-2">
           <div className="flex items-center gap-2 p-1 rounded hover:bg-green-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full bg-green-500 shadow-sm"></div>
-            <span className="text-xs text-gray-800 font-medium">Faible</span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#2E7D32" }}></div>
+            <span className="text-xs text-gray-800 font-medium">Très Faible (&lt;30%)</span>
+          </div>
+          <div className="flex items-center gap-2 p-1 rounded hover:bg-green-50 transition-colors cursor-default">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#4CAF50" }}></div>
+            <span className="text-xs text-gray-800 font-medium">Faible (30-35%)</span>
+          </div>
+          <div className="flex items-center gap-2 p-1 rounded hover:bg-lime-50 transition-colors cursor-default">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#8BC34A" }}></div>
+            <span className="text-xs text-gray-800 font-medium">Moyen-Bas (35-40%)</span>
+          </div>
+          <div className="flex items-center gap-2 p-1 rounded hover:bg-yellow-50 transition-colors cursor-default">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#FFC107" }}></div>
+            <span className="text-xs text-gray-800 font-medium">Moyen-Haut (40-45%)</span>
           </div>
           <div className="flex items-center gap-2 p-1 rounded hover:bg-orange-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full bg-orange-500 shadow-sm"></div>
-            <span className="text-xs text-gray-800 font-medium">Moyen</span>
-          </div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-red-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>
-            <span className="text-xs text-gray-800 font-medium">Élevé</span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#FF9800" }}></div>
+            <span className="text-xs text-gray-800 font-medium">Élevé (≥45%)</span>
           </div>
           <div className="h-px bg-gray-200 my-1"></div>
           <div className="flex items-center gap-2 p-1 rounded hover:bg-blue-50 transition-colors cursor-default">

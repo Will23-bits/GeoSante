@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Modern Healthcare Dashboard Color Scheme - Light Mode Only */
 @theme {

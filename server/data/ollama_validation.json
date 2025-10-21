@@ -1,0 +1,346 @@
+[
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Loiret ?",
+    "output": "Le département Loiret a un score de risque de 0.34 (low-medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Haute-Garonne ?",
+    "output": "Dans le département Haute-Garonne (31), la couverture vaccinale globale est de 56.3%. Détail: Grippe 56.3%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Val-de-Marne ?",
+    "output": "Le département Val-de-Marne a un score de risque de 0.37 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Ariège ?",
+    "output": "Dans le département Ariège (09), la couverture vaccinale globale est de 47.6%. Détail: Grippe 47.6%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Côtes-d'Armor ?",
+    "output": "Le département Côtes-d'Armor a un score de risque de 0.34 (low-medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Morbihan",
+    "output": "Basé sur les données historiques, le risque de grippe dans Morbihan devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Lot",
+    "output": "Basé sur les données historiques, le risque de grippe dans Lot devrait diminuer légèrement au cours des prochaines semaines. Une amélioration de la couverture vaccinale pourrait réduire ce risque."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Vienne ?",
+    "output": "Le département Vienne (86) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 57.2%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Nièvre ?",
+    "output": "Le département Nièvre a un score de risque de 0.37 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Sarthe",
+    "output": "Basé sur les données historiques, le risque de grippe dans Sarthe devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Pyrénées-Atlantiques ?",
+    "output": "Le département Pyrénées-Atlantiques (64) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 57.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Haute-Garonne",
+    "output": "Basé sur les données historiques, le risque de grippe dans Haute-Garonne devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Hautes-Pyrénées ?",
+    "output": "Dans le département Hautes-Pyrénées (65), la couverture vaccinale globale est de 52.6%. Détail: Grippe 52.6%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Yonne ?",
+    "output": "Dans le département Yonne (89), la couverture vaccinale globale est de 52.9%. Détail: Grippe 52.9%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Aude",
+    "output": "Basé sur les données historiques, le risque de grippe dans Aude devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Maine-et-Loire ?",
+    "output": "Le département Maine-et-Loire (49) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 58.1%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Loire-Atlantique ?",
+    "output": "Dans le département Loire-Atlantique (44), la couverture vaccinale globale est de 60.4%. Détail: Grippe 60.4%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Seine-Saint-Denis ?",
+    "output": "Le département Seine-Saint-Denis a un score de risque de 0.45 (high). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Guadeloupe ?",
+    "output": "Le département Guadeloupe a un score de risque de 0.40 (low). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Gers ?",
+    "output": "Le département Gers (32) présente un niveau de risque medium avec un score de 0.38. La couverture vaccinale est de 52.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Hérault ?",
+    "output": "Le département Hérault (34) présente un niveau de risque medium avec un score de 0.36. La couverture vaccinale est de 54.5%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Eure-et-Loir ?",
+    "output": "Dans le département Eure-et-Loir (28), la couverture vaccinale globale est de 55.1%. Détail: Grippe 55.1%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Somme ?",
+    "output": "Le département Somme (80) présente un niveau de risque low-medium avec un score de 0.33. La couverture vaccinale est de 58.5%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Vienne ?",
+    "output": "Dans le département Vienne (86), la couverture vaccinale globale est de 57.2%. Détail: Grippe 57.2%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Vosges ?",
+    "output": "Le département Vosges (88) présente un niveau de risque medium avec un score de 0.38. La couverture vaccinale est de 52.2%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Jura ?",
+    "output": "Le département Jura (39) présente un niveau de risque medium-high avec un score de 0.41. La couverture vaccinale est de 48.5%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Côtes-d'Armor ?",
+    "output": "Le département Côtes-d'Armor (22) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 57.3%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Bas-Rhin ?",
+    "output": "Le département Bas-Rhin a un score de risque de 0.39 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Saône-et-Loire",
+    "output": "Basé sur les données historiques, le risque de grippe dans Saône-et-Loire devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Territoire de Belfort ?",
+    "output": "Dans le département Territoire de Belfort (90), la couverture vaccinale globale est de 47.3%. Détail: Grippe 47.3%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Meuse ?",
+    "output": "Dans le département Meuse (55), la couverture vaccinale globale est de 53.9%. Détail: Grippe 53.9%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Loiret ?",
+    "output": "Le département Loiret (45) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 57.9%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Haute-Garonne ?",
+    "output": "Le département Haute-Garonne a un score de risque de 0.35 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Loir-et-Cher",
+    "output": "Basé sur les données historiques, le risque de grippe dans Loir-et-Cher devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Aveyron ?",
+    "output": "Dans le département Aveyron (12), la couverture vaccinale globale est de 52.4%. Détail: Grippe 52.4%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Martinique ?",
+    "output": "Dans le département Martinique (972), la couverture vaccinale globale est de 11.5%. Détail: Grippe 11.5%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Gers",
+    "output": "Basé sur les données historiques, le risque de grippe dans Gers devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Aveyron",
+    "output": "Basé sur les données historiques, le risque de grippe dans Aveyron devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Somme ?",
+    "output": "Le département Somme a un score de risque de 0.33 (low-medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Haute-Marne ?",
+    "output": "Le département Haute-Marne a un score de risque de 0.39 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Yvelines",
+    "output": "Basé sur les données historiques, le risque de grippe dans Yvelines devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Guyane ?",
+    "output": "Le département Guyane a un score de risque de 0.60 (medium). Le risque est modéré, surveillance recommandée."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Territoire de Belfort ?",
+    "output": "Le département Territoire de Belfort a un score de risque de 0.42 (medium-high). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Ille-et-Vilaine",
+    "output": "Basé sur les données historiques, le risque de grippe dans Ille-et-Vilaine devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Haute-Vienne",
+    "output": "Basé sur les données historiques, le risque de grippe dans Haute-Vienne devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Gard ?",
+    "output": "Dans le département Gard (30), la couverture vaccinale globale est de 52.8%. Détail: Grippe 52.8%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Pyrénées-Atlantiques",
+    "output": "Basé sur les données historiques, le risque de grippe dans Pyrénées-Atlantiques devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Pas-de-Calais ?",
+    "output": "Le département Pas-de-Calais (62) présente un niveau de risque low-medium avec un score de 0.34. La couverture vaccinale est de 57.3%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Ariège",
+    "output": "Basé sur les données historiques, le risque de grippe dans Ariège devrait diminuer légèrement au cours des prochaines semaines. Une amélioration de la couverture vaccinale pourrait réduire ce risque."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Hauts-de-Seine ?",
+    "output": "Le département Hauts-de-Seine (92) présente un niveau de risque medium avec un score de 0.36. La couverture vaccinale est de 54.4%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Lot ?",
+    "output": "Le département Lot a un score de risque de 0.40 (medium-high). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Hérault ?",
+    "output": "Dans le département Hérault (34), la couverture vaccinale globale est de 54.5%. Détail: Grippe 54.5%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Ille-et-Vilaine ?",
+    "output": "Le département Ille-et-Vilaine (35) présente un niveau de risque low-medium avec un score de 0.33. La couverture vaccinale est de 59.2%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Seine-et-Marne",
+    "output": "Basé sur les données historiques, le risque de grippe dans Seine-et-Marne devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Aveyron ?",
+    "output": "Le département Aveyron (12) présente un niveau de risque medium avec un score de 0.38. La couverture vaccinale est de 52.4%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Lot ?",
+    "output": "Dans le département Lot (46), la couverture vaccinale globale est de 49.5%. Détail: Grippe 49.5%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Corse-du-Sud ?",
+    "output": "Dans le département Corse-du-Sud (2A), la couverture vaccinale globale est de 45.5%. Détail: Grippe 45.5%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Nord ?",
+    "output": "Dans le département Nord (59), la couverture vaccinale globale est de 55.8%. Détail: Grippe 55.8%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Aube",
+    "output": "Basé sur les données historiques, le risque de grippe dans Aube devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Vendée ?",
+    "output": "Le département Vendée a un score de risque de 0.34 (low-medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Hautes-Pyrénées ?",
+    "output": "Le département Hautes-Pyrénées (65) présente un niveau de risque medium avec un score de 0.38. La couverture vaccinale est de 52.6%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Hérault ?",
+    "output": "Le département Hérault a un score de risque de 0.36 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Aisne ?",
+    "output": "Le département Aisne (02) présente un niveau de risque medium avec un score de 0.36. La couverture vaccinale est de 55.2%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Deux-Sèvres ?",
+    "output": "Le département Deux-Sèvres (79) présente un niveau de risque medium avec un score de 0.37. La couverture vaccinale est de 53.8%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Tarn ?",
+    "output": "Le département Tarn (81) présente un niveau de risque medium avec un score de 0.38. La couverture vaccinale est de 52.7%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Marne",
+    "output": "Basé sur les données historiques, le risque de grippe dans Marne devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Guadeloupe ?",
+    "output": "Dans le département Guadeloupe (971), la couverture vaccinale globale est de 15.1%. Détail: Grippe 15.1%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Saint-Barthélemy ?",
+    "output": "Le département Saint-Barthélemy (977) présente un niveau de risque low avec un score de 0.30. Les données de vaccination ne sont pas disponibles."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Cher ?",
+    "output": "Le département Cher (18) présente un niveau de risque medium avec un score de 0.37. La couverture vaccinale est de 53.7%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Tarn-et-Garonne ?",
+    "output": "Le département Tarn-et-Garonne (82) présente un niveau de risque medium avec un score de 0.39. La couverture vaccinale est de 51.8%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Nord ?",
+    "output": "Le département Nord (59) présente un niveau de risque medium avec un score de 0.35. La couverture vaccinale est de 55.8%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Mayenne ?",
+    "output": "Le département Mayenne (53) présente un niveau de risque medium avec un score de 0.37. La couverture vaccinale est de 53.4%."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Mayenne ?",
+    "output": "Dans le département Mayenne (53), la couverture vaccinale globale est de 53.4%. Détail: Grippe 53.4%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Lot ?",
+    "output": "Le département Lot (46) présente un niveau de risque medium-high avec un score de 0.40. La couverture vaccinale est de 49.5%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Hauts-de-Seine",
+    "output": "Basé sur les données historiques, le risque de grippe dans Hauts-de-Seine devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Vendée ?",
+    "output": "Dans le département Vendée (85), la couverture vaccinale globale est de 57.5%. Détail: Grippe 57.5%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Mayotte ?",
+    "output": "Le département Mayotte (976) présente un niveau de risque high avec un score de 0.70. La couverture vaccinale est de 0.0%."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Var",
+    "output": "Basé sur les données historiques, le risque de grippe dans Var devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Guyane ?",
+    "output": "Dans le département Guyane (973), la couverture vaccinale globale est de 14.8%. Détail: Grippe 14.8%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Ariège ?",
+    "output": "Le département Ariège (09) présente un niveau de risque medium-high avec un score de 0.42. La couverture vaccinale est de 47.6%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Alpes-Maritimes ?",
+    "output": "Le département Alpes-Maritimes (06) présente un niveau de risque medium-high avec un score de 0.41. La couverture vaccinale est de 48.7%."
+  },
+  {
+    "instruction": "Quel est le niveau de risque de grippe dans le département Nouvelle-Calédonie ?",
+    "output": "Le département Nouvelle-Calédonie (988) présente un niveau de risque medium avec un score de 0.50. Les données de vaccination ne sont pas disponibles."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Gard ?",
+    "output": "Le département Gard a un score de risque de 0.38 (medium). Le risque est faible, situation stable."
+  },
+  {
+    "instruction": "Prédisez l'évolution du risque de grippe pour Vendée",
+    "output": "Basé sur les données historiques, le risque de grippe dans Vendée devrait diminuer légèrement au cours des prochaines semaines. La couverture vaccinale actuelle contribue à maintenir un risque contrôlé."
+  },
+  {
+    "instruction": "Quelle est la couverture vaccinale dans Aisne ?",
+    "output": "Dans le département Aisne (02), la couverture vaccinale globale est de 55.2%. Détail: Grippe 55.2%, COVID-19 0.0%, HPV 0.0%, Méningocoque 0.0%."
+  },
+  {
+    "instruction": "Comment évaluer le risque de grippe dans Ariège ?",
+    "output": "Le département Ariège a un score de risque de 0.42 (medium-high). Le risque est faible, situation stable."
+  }
+]

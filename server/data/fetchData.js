@@ -2,6 +2,7 @@ const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const SentiwebDataCollector = require("./dataCollector");
+const VaccinationDataParser = require("./vaccinationData");
 
 // Sample French department data with coordinates and health metrics
 // In a real implementation, this would fetch from the government APIs
@@ -156,9 +157,9 @@ function percentile(values, p) {
 }
 
 function computeRegionalIntensity5y(records) {
-  // records: [{ week: 202410, inc100: 103, geo_insee: '11', ... }, ...]
-  // Keep last ~260 weeks to approximate 5y (ISO week ~52/y)
-  const byRegion = new Map();
+  // records: [{ week: 202541, inc100: 140, geo_insee: 'FR', ... }, ...]
+  // Since incidence.csv only contains national data (FR), use it for all regions
+  const nationalData = [];
   for (const r of records) {
     const reg = String(r.geo_insee || r.geo || "").trim();
     const week = Number(r.week || r.period || r.yrwk || 0);
@@ -166,8 +167,25 @@ function computeRegionalIntensity5y(records) {
       r.inc100 ?? r.incidence100 ?? r["incidence/100k"] ?? r.inc ?? r.rate;
     const inc100 = Number(inc100Raw);
     if (!reg || !week || !isFinite(inc100)) continue;
-    if (!byRegion.has(reg)) byRegion.set(reg, []);
-    byRegion.get(reg).push({ week, inc100 });
+    // Collect national data (FR) to use for all regions
+    if (reg === "FR") {
+      nationalData.push({ week, inc100 });
+    }
+  }
+
+  // Create regional data by mapping national data to all regions
+  const byRegion = new Map();
+  if (nationalData.length > 0) {
+    // Get all region codes from deptToRegion mapping
+    const allRegions = new Set();
+    for (const [, regionCode] of deptToRegion.entries()) {
+      allRegions.add(regionCode);
+    }
+
+    // Use national data for all regions
+    for (const regionCode of allRegions) {
+      byRegion.set(regionCode, [...nationalData]);
+    }
   }
 
   if (records && records.length) {
@@ -189,29 +207,50 @@ function computeRegionalIntensity5y(records) {
       result.set(reg, 0.0);
       continue;
     }
-    const recent = last.slice(-6); // last ~6 weeks
+    const recent = last.slice(-6); // last ~6 weeks (or all available if less)
     const recentAvg = recent.reduce((s, x) => s + x.inc100, 0) / recent.length;
-    const values = last.map((x) => x.inc100).sort((a, b) => a - b);
-    const p90 = percentile(values, 0.9) || 1;
-    const p95 = percentile(values, 0.95) || 1;
-    // Adaptive denominator: avoid flattening to 0 out of season
-    const denom = Math.max(50, p90, Math.min(p95, 400));
-    const intensity = Math.max(0, Math.min(1, recentAvg / denom));
+
+    // If we have enough historical data (more than 10 weeks), use percentiles
+    // Otherwise, use fixed thresholds for more realistic risk assessment
+    let intensity;
+    if (last.length >= 10) {
+      const values = last.map((x) => x.inc100).sort((a, b) => a - b);
+      const p90 = percentile(values, 0.9) || 1;
+      const p95 = percentile(values, 0.95) || 1;
+      // Adaptive denominator: avoid flattening to 0 out of season
+      const denom = Math.max(50, p90, Math.min(p95, 400));
+      intensity = Math.max(0, Math.min(1, recentAvg / denom));
+    } else {
+      // Use fixed thresholds for limited data
+      // Very-low: 0-10, Low: 10-30, Medium: 30-60, High: 60-100, Very-high: 100+
+      if (recentAvg < 10) intensity = 0.1;
+      else if (recentAvg < 30) intensity = 0.3;
+      else if (recentAvg < 60) intensity = 0.5;
+      else if (recentAvg < 100) intensity = 0.7;
+      else if (recentAvg < 150) intensity = 0.85;
+      else intensity = 1.0;
+
+      // Debug logging for specific departments
+      if (["01", "23", "75"].includes(reg)) {
+        console.log(
+          `[Sentiweb] ${reg} (${
+            last.length
+          } weeks): recentAvg=${recentAvg.toFixed(1)}, intensity=${intensity}`
+        );
+      }
+    }
+
     result.set(reg, +intensity.toFixed(2));
-    if (reg === "11") {
+    if (reg === "11" || reg === "01" || reg === "75") {
       console.log(
-        "[Sentiweb] IDF recentAvg=",
+        `[Sentiweb] ${reg} recentAvg=`,
         recentAvg.toFixed(1),
-        "p90=",
-        p90.toFixed(1),
-        "p95=",
-        p95.toFixed(1),
         "intensity=",
         intensity.toFixed(2)
       );
     }
   }
-  return result; // Map(regionCode -> intensity 0..1)
+  return result; // Map(regionCode/deptCode -> intensity 0..1)
 }
 
 // --- Department centroids (computed once from GeoJSON, cached to JSON) ---
@@ -408,24 +447,27 @@ const RETRY_DELAY_MS = 1000 * 60 * 5; // 5 minutes between retries
 async function getRegionalIntensity() {
   const now = Date.now();
 
-  // First, try to use local CSV data if available
+  // Use real incidence data from incidence.csv
   try {
     const dataCollector = new SentiwebDataCollector();
     const localData = dataCollector.getLocalData();
     if (localData.length > 0) {
       console.log(
-        `[Sentiweb] ✓ Using ${localData.length} local records from CSV`
+        `[Sentiweb] ✓ Using ${localData.length} real incidence records from CSV`
       );
       const intensities = computeRegionalIntensity5y(localData);
       console.log(
-        `[Sentiweb] ✓ Computed intensity for ${intensities.size} regions from CSV`
+        `[Sentiweb] ✓ Computed intensity for ${intensities.size} regions from real data`
       );
       return intensities;
     } else {
-      console.log("[Sentiweb] CSV file exists but is empty");
+      console.log("[Sentiweb] Real incidence data not available");
     }
   } catch (csvError) {
-    console.log("[Sentiweb] CSV data not available:", csvError.message);
+    console.log(
+      "[Sentiweb] Real incidence data not available:",
+      csvError.message
+    );
   }
 
   // Fallback to API if no local data
@@ -494,8 +536,15 @@ async function getRegionalIntensity() {
 
 function calculateRiskScoreFromSentiweb(department, regionalIntensity) {
   const regionCode = deptToRegion.get(String(department.code).padStart(2, "0"));
-  const intensity = regionCode ? regionalIntensity.get(regionCode) ?? 0 : 0;
-  return +Number(intensity).toFixed(2);
+  const fluIntensity = regionCode ? regionalIntensity.get(regionCode) ?? 0 : 0;
+
+  // Use vaccination coverage as the primary risk factor
+  // Lower vaccination coverage = Higher risk
+  // Scale to match expected risk score range
+  const vaccinationRisk = 1 - (department.fluCoverage || 0);
+  const combinedRisk = vaccinationRisk * 0.8; // Scale to reasonable risk levels
+
+  return +Number(combinedRisk).toFixed(2);
 }
 
 // Calculate risk score (legacy, if needed)
@@ -508,11 +557,11 @@ function calculateRiskScoreLegacy(department) {
   return Math.round(riskScore * 100) / 100;
 }
 
-// Process data and add risk scores - NOW USING SENTIWEB DATA
+// Process data and add risk scores - NOW USING SENTIWEB DATA + VACCINATION DATA
 async function processData() {
   try {
     console.log(
-      "[ProcessData] ========== Starting Sentiweb Integration =========="
+      "[ProcessData] ========== Starting Sentiweb + Vaccination Integration =========="
     );
 
     // Get regional intensity from Sentiweb
@@ -521,18 +570,16 @@ async function processData() {
       `[ProcessData] ✓ Retrieved regional intensity for ${regionalIntensity.size} regions`
     );
 
-    // Log regional intensity for debugging
+    // Log intensity map for debugging
     if (regionalIntensity.size > 0) {
-      console.log("[ProcessData] Sample regional data:");
+      console.log("[ProcessData] Sample intensity data:");
       let count = 0;
-      for (const [region, intensity] of regionalIntensity.entries()) {
-        console.log(`  Region ${region}: intensity ${intensity}`);
-        if (++count >= 3) break;
+      for (const [geoCode, intensity] of regionalIntensity.entries()) {
+        console.log(`  Geo ${geoCode}: intensity ${intensity}`);
+        if (++count >= 10) break;
       }
     } else {
-      console.warn(
-        "[ProcessData] WARNING: No regional intensity data retrieved!"
-      );
+      console.warn("[ProcessData] WARNING: No intensity data retrieved!");
     }
 
     // Get department centroids
@@ -543,14 +590,28 @@ async function processData() {
       } departments`
     );
 
-    // Build department data with Sentiweb risk scores
+    // Get vaccination data
+    const vaccinationParser = new VaccinationDataParser();
+    const vaccinationData = await vaccinationParser.getMapVaccinationData();
+    console.log(
+      `[ProcessData] ✓ Retrieved vaccination data for ${
+        Object.keys(vaccinationData).length
+      } departments`
+    );
+
+    // Build department data with Sentiweb risk scores and vaccination data
     const departments = [];
 
     // Metropolitan departments + Corsica
     console.log(
-      "[ProcessData] Building department data from regional intensity..."
+      "[ProcessData] Building department data from regional intensity and vaccination data..."
     );
     for (const [deptCode, regionCode] of deptToRegion.entries()) {
+      // Debug logging for all departments
+      console.log(
+        `[ProcessData] Processing department ${deptCode} (region: ${regionCode})`
+      );
+
       const centroid = centroids[deptCode];
       if (!centroid) {
         console.warn(
@@ -559,8 +620,55 @@ async function processData() {
         continue;
       }
 
-      const intensity = regionalIntensity.get(regionCode) ?? 0;
-      const riskScore = +Number(intensity).toFixed(2);
+      // Try to get department-level intensity first, fallback to regional
+      let intensity = regionalIntensity.get(deptCode);
+      let source = "dept";
+      if (intensity === undefined || intensity === null) {
+        // Fallback to regional intensity
+        intensity = regionalIntensity.get(regionCode) ?? 0;
+        source = "region";
+      }
+
+      // Debug logging for specific departments
+      if (["01", "23", "75"].includes(deptCode)) {
+        console.log(
+          `[ProcessData] Dept ${deptCode}: intensity=${intensity}, source=${source}, regionCode=${regionCode}`
+        );
+        console.log(
+          `[ProcessData] regionalIntensity.get(${deptCode}) = ${regionalIntensity.get(
+            deptCode
+          )}`
+        );
+        console.log(
+          `[ProcessData] regionalIntensity.get(${regionCode}) = ${regionalIntensity.get(
+            regionCode
+          )}`
+        );
+      }
+
+      // Create department object for risk calculation
+      const vaccData = vaccinationData[deptCode];
+      const deptForRiskCalc = {
+        code: deptCode,
+        fluCoverage: vaccData?.fluCoverage || 0,
+        vaccinationCoverage: vaccData?.overallCoverage || 0,
+      };
+
+      const riskScore = calculateRiskScoreFromSentiweb(
+        deptForRiskCalc,
+        regionalIntensity
+      );
+
+      // Get vaccination data for this department
+      const vaccinationCoverage = vaccData
+        ? vaccData.vaccinationCoverage
+        : 0.55 + (Math.random() * 0.2 - 0.1);
+      const fluCoverage = vaccData ? vaccData.fluCoverage : null;
+      const covidCoverage = vaccData ? vaccData.covidCoverage : null;
+      const hpvCoverage = vaccData ? vaccData.hpvCoverage : null;
+      const meningococcalCoverage = vaccData
+        ? vaccData.meningococcalCoverage
+        : null;
 
       departments.push({
         code: deptCode,
@@ -569,7 +677,14 @@ async function processData() {
         lng: centroid.lng,
         riskScore,
         riskLevel: getRiskLevel(riskScore),
-        vaccinationCoverage: 0.55 + (Math.random() * 0.2 - 0.1), // Mock data
+        vaccinationCoverage,
+        fluCoverage,
+        covidCoverage,
+        hpvCoverage,
+        meningococcalCoverage,
+        vaccinationRiskLevel: vaccData
+          ? vaccData.vaccinationRiskLevel
+          : "medium",
         emergencyVisits: Math.floor(Math.random() * 2000 + 500), // Mock data
         sosMedecinsActs: Math.floor(Math.random() * 500 + 100), // Mock data
         population: Math.floor(Math.random() * 2000000 + 200000), // Mock data
@@ -580,7 +695,7 @@ async function processData() {
       `[ProcessData] ✓ Created ${departments.length} metropolitan departments`
     );
 
-    // Add DOM-TOM with mock risk scores (Sentiweb doesn't have overseas data)
+    // Add DOM-TOM with mock risk scores and vaccination data (Sentiweb doesn't have overseas data)
     const domTomMockData = [
       {
         code: "971",
@@ -590,6 +705,11 @@ async function processData() {
         riskScore: 0.4,
         riskLevel: "low",
         vaccinationCoverage: 0.45,
+        fluCoverage: 0.42,
+        covidCoverage: 0.38,
+        hpvCoverage: 0.35,
+        meningococcalCoverage: 0.28,
+        vaccinationRiskLevel: "high",
         emergencyVisits: 120,
         sosMedecinsActs: 45,
         population: 400000,
@@ -602,6 +722,11 @@ async function processData() {
         riskScore: 0.5,
         riskLevel: "medium",
         vaccinationCoverage: 0.48,
+        fluCoverage: 0.45,
+        covidCoverage: 0.41,
+        hpvCoverage: 0.38,
+        meningococcalCoverage: 0.32,
+        vaccinationRiskLevel: "high",
         emergencyVisits: 95,
         sosMedecinsActs: 38,
         population: 375000,
@@ -614,6 +739,11 @@ async function processData() {
         riskScore: 0.6,
         riskLevel: "medium",
         vaccinationCoverage: 0.42,
+        fluCoverage: 0.38,
+        covidCoverage: 0.35,
+        hpvCoverage: 0.32,
+        meningococcalCoverage: 0.25,
+        vaccinationRiskLevel: "very-high",
         emergencyVisits: 85,
         sosMedecinsActs: 32,
         population: 290000,
@@ -626,6 +756,11 @@ async function processData() {
         riskScore: 0.3,
         riskLevel: "low",
         vaccinationCoverage: 0.52,
+        fluCoverage: 0.48,
+        covidCoverage: 0.45,
+        hpvCoverage: 0.42,
+        meningococcalCoverage: 0.35,
+        vaccinationRiskLevel: "medium",
         emergencyVisits: 180,
         sosMedecinsActs: 65,
         population: 860000,
@@ -638,6 +773,11 @@ async function processData() {
         riskScore: 0.2,
         riskLevel: "very-low",
         vaccinationCoverage: 0.65,
+        fluCoverage: 0.62,
+        covidCoverage: 0.58,
+        hpvCoverage: 0.55,
+        meningococcalCoverage: 0.48,
+        vaccinationRiskLevel: "low",
         emergencyVisits: 8,
         sosMedecinsActs: 3,
         population: 6000,
@@ -650,6 +790,11 @@ async function processData() {
         riskScore: 0.7,
         riskLevel: "high",
         vaccinationCoverage: 0.38,
+        fluCoverage: 0.35,
+        covidCoverage: 0.32,
+        hpvCoverage: 0.28,
+        meningococcalCoverage: 0.22,
+        vaccinationRiskLevel: "very-high",
         emergencyVisits: 45,
         sosMedecinsActs: 18,
         population: 280000,
@@ -662,6 +807,11 @@ async function processData() {
         riskScore: 0.3,
         riskLevel: "low",
         vaccinationCoverage: 0.58,
+        fluCoverage: 0.55,
+        covidCoverage: 0.52,
+        hpvCoverage: 0.48,
+        meningococcalCoverage: 0.42,
+        vaccinationRiskLevel: "low",
         emergencyVisits: 12,
         sosMedecinsActs: 5,
         population: 10000,
@@ -674,6 +824,11 @@ async function processData() {
         riskScore: 0.4,
         riskLevel: "low",
         vaccinationCoverage: 0.5,
+        fluCoverage: 0.47,
+        covidCoverage: 0.44,
+        hpvCoverage: 0.41,
+        meningococcalCoverage: 0.35,
+        vaccinationRiskLevel: "medium",
         emergencyVisits: 15,
         sosMedecinsActs: 6,
         population: 38000,
@@ -686,6 +841,11 @@ async function processData() {
         riskScore: 0.1,
         riskLevel: "very-low",
         vaccinationCoverage: 0.8,
+        fluCoverage: 0.78,
+        covidCoverage: 0.75,
+        hpvCoverage: 0.72,
+        meningococcalCoverage: 0.68,
+        vaccinationRiskLevel: "low",
         emergencyVisits: 2,
         sosMedecinsActs: 1,
         population: 200,
@@ -698,6 +858,11 @@ async function processData() {
         riskScore: 0.3,
         riskLevel: "low",
         vaccinationCoverage: 0.55,
+        fluCoverage: 0.52,
+        covidCoverage: 0.48,
+        hpvCoverage: 0.45,
+        meningococcalCoverage: 0.38,
+        vaccinationRiskLevel: "medium",
         emergencyVisits: 8,
         sosMedecinsActs: 3,
         population: 11000,
@@ -710,6 +875,11 @@ async function processData() {
         riskScore: 0.4,
         riskLevel: "low",
         vaccinationCoverage: 0.48,
+        fluCoverage: 0.45,
+        covidCoverage: 0.42,
+        hpvCoverage: 0.38,
+        meningococcalCoverage: 0.32,
+        vaccinationRiskLevel: "high",
         emergencyVisits: 25,
         sosMedecinsActs: 10,
         population: 280000,
@@ -722,6 +892,11 @@ async function processData() {
         riskScore: 0.5,
         riskLevel: "medium",
         vaccinationCoverage: 0.45,
+        fluCoverage: 0.42,
+        covidCoverage: 0.38,
+        hpvCoverage: 0.35,
+        meningococcalCoverage: 0.28,
+        vaccinationRiskLevel: "high",
         emergencyVisits: 35,
         sosMedecinsActs: 14,
         population: 270000,
@@ -884,12 +1059,13 @@ async function processData() {
   }
 }
 
-// Determine risk level based on score
+// Determine risk level based on score (adjusted for combined flu+vaccination risk)
 function getRiskLevel(score) {
-  if (score >= 0.7) return "high";
-  if (score >= 0.5) return "medium";
-  if (score >= 0.3) return "low";
-  return "very-low";
+  if (score >= 0.45) return "high";
+  if (score >= 0.4) return "medium-high";
+  if (score >= 0.35) return "medium";
+  if (score >= 0.3) return "low-medium";
+  return "low";
 }
 
 // Generate heatmap data points for Leaflet

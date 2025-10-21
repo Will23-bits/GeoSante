@@ -132,4 +132,34 @@ router.get("/stats", async (_req, res) => {
 //   }
 // });
 
+// Debug endpoint to check intensity map
+router.get("/debug-intensity", async (req, res) => {
+  try {
+    const SentiwebDataCollector = require("../data/dataCollector");
+    const collector = new SentiwebDataCollector();
+    const data = collector.getLocalData();
+
+    const fs = require("fs");
+    const path = require("path");
+    const csvPath = path.join(__dirname, "../../incidence.csv");
+
+    const debugData = {
+      totalRecords: data.length,
+      source: "Real incidence data from incidence.csv",
+      csvPath: csvPath,
+      fileExists: fs.existsSync(csvPath),
+      sampleRecords: data && data.length > 0 ? data.slice(0, 3) : [],
+      regions:
+        data && data.length > 0
+          ? [...new Set(data.map((r) => r.geo_insee))]
+          : [],
+    };
+
+    res.json(debugData);
+  } catch (error) {
+    console.error("Error in debug endpoint:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
