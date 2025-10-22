@@ -1,0 +1,18 @@
+[
+  {
+    "week": "2024-W03",
+    "regionCode": "75",
+    "regionName": "Paris",
+    "age": "18-49",
+    "incidencePer100k": 150,
+    "coveragePct": null
+  },
+  {
+    "week": "2024-W03",
+    "regionCode": "84",
+    "regionName": "Avignon",
+    "age": "65+",
+    "incidencePer100k": 239.99999999999997,
+    "coveragePct": null
+  }
+]

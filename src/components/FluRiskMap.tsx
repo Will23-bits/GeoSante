@@ -8,11 +8,10 @@ import axios from "axios";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+// Badge import removed (unused)
 import { Button } from "@/components/ui/button";
 
 interface Department {
@@ -265,21 +264,21 @@ function DepartmentMarkers({ departments, onDepartmentClick }: { departments: De
 
   useEffect(() => {
     if (departments && departments.length > 0) {
-      const isOverseas = (code: string) =>
-        [
-          "971", // Guadeloupe
-          "972", // Martinique
-          "973", // Guyane
-          "974", // La Réunion
-          "975", // Saint-Pierre-et-Miquelon
-          "976", // Mayotte
-          "977", // Saint-Barthélemy
-          "978", // Saint-Martin
-          "984", // Terres australes et antarctiques françaises
-          "986", // Wallis-et-Futuna
-          "987", // Polynésie française
-          "988", // Nouvelle-Calédonie
-        ].includes(String(code));
+      // const isOverseas = (code: string) =>
+      //   [
+      //     "971", // Guadeloupe
+      //     "972", // Martinique
+      //     "973", // Guyane
+      //     "974", // La Réunion
+      //     "975", // Saint-Pierre-et-Miquelon
+      //     "976", // Mayotte
+      //     "977", // Saint-Barthélemy
+      //     "978", // Saint-Martin
+      //     "984", // Terres australes et antarctiques françaises
+      //     "986", // Wallis-et-Futuna
+      //     "987", // Polynésie française
+      //     "988", // Nouvelle-Calédonie
+      //   ].includes(String(code));
 
       // Mainland France markers - removed dots, keeping only popup functionality
       const mainlandMarkers: any[] = [];
