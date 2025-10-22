@@ -1,1 +1,4 @@
-week,indicator,inc,inc_low,inc_up,inc100,inc100_low,inc100_up,geo_insee,geo_name,collected_at
+date,regionCode,regionName,age,cases,population
+2024-01-15,FR-84,Avignon,65+,120,50000
+2024-01-15,FR-75,Paris,18-49,300,200000
+
