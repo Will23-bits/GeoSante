@@ -16,7 +16,7 @@ function ChatBot() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "🤖 **Assistant IA Prédictive** - Bonjour ! Je suis spécialisé dans l'analyse du risque de grippe en France. Grâce à mon entraînement sur 5 ans de données épidémiologiques, je peux vous fournir des analyses actuelles et des **prédictions pour les années futures**. Demandez-moi des informations sur la couverture vaccinale, les niveaux de risque ou les tendances à venir !",
+      text: "**Assistant IA Prédictive** - Bonjour ! Je suis spécialisé dans l'analyse du risque de grippe en France. Grâce à mon entraînement sur 5 ans de données épidémiologiques, je peux vous fournir des analyses actuelles et des **prédictions pour les années futures**. Demandez-moi des informations sur la couverture vaccinale, les niveaux de risque ou les tendances à venir !",
       sender: "bot",
       timestamp: new Date().toISOString(),
     },
@@ -38,6 +38,14 @@ function ChatBot() {
     setInputMessage("");
     setIsLoading(true);
 
+    // Auto-scroll to bottom after user message
+    setTimeout(() => {
+      const messagesContainer = document.querySelector('.chat-messages-container');
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }, 100);
+
     try {
       const response = await axios.post("/api/chat", {
         message: inputMessage,
@@ -51,6 +59,14 @@ function ChatBot() {
       };
 
       setMessages((prev) => [...prev, botMessage]);
+
+      // Auto-scroll to bottom after bot message
+      setTimeout(() => {
+        const messagesContainer = document.querySelector('.chat-messages-container');
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }, 100);
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage = {
@@ -60,6 +76,14 @@ function ChatBot() {
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);
+
+      // Auto-scroll to bottom after error message
+      setTimeout(() => {
+        const messagesContainer = document.querySelector('.chat-messages-container');
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -81,25 +105,25 @@ function ChatBot() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <Card className="flex-1 flex flex-col overflow-hidden border-0 shadow-none bg-white">
-        <CardHeader className="flex-shrink-0 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="flex-1 flex flex-col border-0 shadow-none bg-white overflow-y-auto">
+        <CardHeader className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base font-bold text-gray-900 uppercase tracking-wide">
-                🤖 Assistant IA Prédictive
+              <CardTitle className="text-base font-bold text-[#161616] uppercase tracking-wide">
+                Assistant IA Prédictive
               </CardTitle>
-              <p className="text-xs text-gray-600 mt-1 font-medium">
+              <p className="text-sm text-[#666666] mt-1 font-medium">
                 Analyse épidémiologique & prédictions grippales
               </p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-md">
+            <div className="w-10 h-10 bg-[#000091] rounded flex items-center justify-center text-white text-xs font-bold">
               IA
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+        <CardContent className="flex-1 flex flex-col min-h-0">
+          <div className="chat-messages-container flex-1 overflow-y-auto space-y-4 p-4 min-h-[300px]">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -107,17 +131,22 @@ function ChatBot() {
                   }`}
               >
                 <Card
-                  className={`max-w-[80%] shadow-md ${message.sender === "user"
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-600"
-                    : "bg-white border-gray-200"
+                  className={`max-w-[85%] ${message.sender === "user"
+                    ? "bg-[#000091] text-white border-0"
+                    : "bg-gray-50 border border-gray-200"
                     }`}
                 >
-                  <CardContent className="p-3">
-                    <div className="mb-1 leading-relaxed">
+                  <CardContent className="p-4">
+                    <div className="mb-2 leading-relaxed text-sm">
                       {message.sender === "bot" ? (
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0 text-gray-700">{children}</p>,
+                            strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1 text-gray-700">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1 text-gray-700">{children}</ol>,
+                            li: ({ children }) => <li className="text-sm text-gray-700">{children}</li>,
                             h1: ({ children }) => (
                               <h1 className="text-lg font-semibold mb-2 text-gray-900">
                                 {children}
@@ -132,27 +161,6 @@ function ChatBot() {
                               <h3 className="text-sm font-semibold mb-1 text-gray-900">
                                 {children}
                               </h3>
-                            ),
-                            p: ({ children }) => (
-                              <p className="mb-2 last:mb-0 text-gray-700">{children}</p>
-                            ),
-                            ul: ({ children }) => (
-                              <ul className="list-disc list-inside mb-2 space-y-1">
-                                {children}
-                              </ul>
-                            ),
-                            ol: ({ children }) => (
-                              <ol className="list-decimal list-inside mb-2 space-y-1">
-                                {children}
-                              </ol>
-                            ),
-                            li: ({ children }) => (
-                              <li className="mb-1">{children}</li>
-                            ),
-                            strong: ({ children }) => (
-                              <strong className="font-semibold text-blue-700">
-                                {children}
-                              </strong>
                             ),
                             em: ({ children }) => (
                               <em className="italic text-gray-600">
@@ -195,16 +203,16 @@ function ChatBot() {
 
             {isLoading && (
               <div className="flex justify-start">
-                <Card className="bg-white border-gray-200 shadow-md">
-                  <CardContent className="p-3">
-                    <div className="flex gap-1 items-center">
-                      <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                <Card className="bg-gray-50 border border-gray-200">
+                  <CardContent className="p-4">
+                    <div className="flex gap-2 items-center">
+                      <span className="w-3 h-3 bg-[#000091] rounded-full animate-pulse"></span>
                       <span
-                        className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+                        className="w-3 h-3 bg-[#000091] rounded-full animate-pulse"
                         style={{ animationDelay: "0.2s" }}
                       ></span>
                       <span
-                        className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+                        className="w-3 h-3 bg-[#000091] rounded-full animate-pulse"
                         style={{ animationDelay: "0.4s" }}
                       ></span>
                     </div>
@@ -214,76 +222,71 @@ function ChatBot() {
             )}
           </div>
 
-          <div className="space-y-4 flex-shrink-0">
-            <div className="flex gap-2">
+          <div className="space-y-3 flex-shrink-0 p-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex gap-4">
               <Textarea
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Demandez des analyses actuelles ou des prédictions pour 2026..."
-                rows={2}
+                placeholder="Posez vos questions sur les risques grippaux, la vaccination, ou demandez des prédictions..."
+                rows={3}
                 disabled={isLoading}
-                className="flex-1 resize-none border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl text-gray-800 placeholder:text-gray-400"
+                className="flex-1 resize-none border border-gray-300 bg-white focus:ring-2 focus:ring-[#000091] focus:border-[#000091] rounded text-gray-800 placeholder:text-gray-500 text-sm leading-relaxed"
               />
               <Button
                 onClick={sendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                size="sm"
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 font-semibold"
+                className="bg-[#000091] hover:bg-[#1212ff] text-white px-8 py-3 font-medium text-base rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Envoyer
+                {isLoading ? "..." : "Envoyer"}
               </Button>
             </div>
 
-            <div className="space-y-2 border-t border-gray-200 pt-3">
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-xs text-gray-600 font-bold uppercase tracking-wide">Requêtes Suggérées</p>
-                <Badge variant="secondary" className="text-xs bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 border-purple-200">
-                  🤖 IA Prédictive
+            <div className="space-y-3 border-t border-gray-200 pt-3">
+              <div className="flex items-center gap-3 mb-2">
+                <p className="text-sm text-[#161616] font-bold uppercase tracking-wide">Requêtes Suggérées</p>
+                <Badge className="text-xs bg-[#6a6af4] hover:bg-[#5a5ae4] text-white border-0 px-3 py-1 font-medium">
+                  IA Prédictive
                 </Badge>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col gap-3">
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() =>
                     setInputMessage(
                       "Quels départements ont le risque de grippe le plus élevé ?"
                     )
                   }
-                  className="text-xs border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 font-semibold"
+                  className="text-sm border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white font-medium h-auto py-3 px-4 text-left justify-start"
                 >
                   Départements à haut risque
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() =>
                     setInputMessage("Quelle est la couverture vaccinale à Paris ?")
                   }
-                  className="text-xs border-green-300 text-green-700 hover:bg-green-600 hover:text-white hover:border-green-600 transition-all duration-200 font-semibold"
+                  className="text-sm border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white font-medium h-auto py-3 px-4 text-left justify-start"
                 >
                   Couverture Paris
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() =>
                     setInputMessage("Quelle sera la tendance grippale pour 2026 ?")
                   }
-                  className="text-xs border-purple-300 text-purple-700 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 font-semibold"
+                  className="text-sm border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white font-medium h-auto py-3 px-4 text-left justify-start"
                 >
-                  🔮 Prédictions 2026
+                  Prédictions 2026
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() =>
                     setInputMessage("Comment évoluera le risque grippal dans les années à venir ?")
                   }
-                  className="text-xs border-orange-300 text-orange-700 hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-200 font-semibold"
+                  className="text-sm border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white font-medium h-auto py-3 px-4 text-left justify-start"
                 >
-                  📈 Tendances futures
+                  Tendances futures
                 </Button>
               </div>
             </div>

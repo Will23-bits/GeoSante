@@ -163,408 +163,433 @@ function Dashboard() {
   };
 
   return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
+    <div className="h-screen bg-white flex flex-col overflow-hidden">
+      {/* Header */}
+      <header className="flex-shrink-0 bg-white shadow-sm border-b border-gray-200">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-lg tracking-tight">
-                    GS
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                      GeoSante
-                    </h1>
-                    <p className="text-xs text-gray-600 font-medium">
-                      Surveillance épidémiologique de la grippe
-                    </p>
-                  </div>
+                <div className="w-12 h-12 bg-[#000091] rounded flex items-center justify-center text-white text-lg font-bold">
+                  GS
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                {/* Menu d'exportation avec des boutons séparés au lieu d'un dropdown */}
-                <div className="flex space-x-2">
-                  <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={exportVaccinationData}
-                      className="px-5 py-2.5 font-semibold text-sm transition-all duration-200 uppercase tracking-wide bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border-green-600 shadow-md hover:shadow-lg"
-                      disabled={!!exportStatus}
-                  >
-                    {exportStatus && exportStatus.includes("vaccination") ? (
-                        <>
-                          <span className="animate-spin inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
-                          Export...
-                        </>
-                    ) : (
-                        <>💉 Export Vaccination</>
-                    )}
-                  </Button>
-
-                  <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={exportIncidenceData}
-                      className="px-5 py-2.5 font-semibold text-sm transition-all duration-200 uppercase tracking-wide bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-red-600 shadow-md hover:shadow-lg"
-                      disabled={!!exportStatus}
-                  >
-                    {exportStatus && exportStatus.includes("incidence") ? (
-                        <>
-                          <span className="animate-spin inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
-                          Export...
-                        </>
-                    ) : (
-                        <>🦠 Export Incidence</>
-                    )}
-                  </Button>
+                <div>
+                  <h1 className="text-2xl font-bold text-[#161616]">
+                    GeoSante
+                  </h1>
+                  <p className="text-sm text-[#666666] font-medium">
+                    Surveillance épidémiologique intelligente
+                  </p>
                 </div>
-
-                {/* Bouton Simulateur existant */}
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open('./Simulateur/index.html', '_blank')}
-                    className="px-5 py-2.5 font-semibold text-sm transition-all duration-200 uppercase tracking-wide bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border-purple-600 shadow-md hover:shadow-lg"
-                >
-                  🧪 Simulateur
-                </Button>
-
-                {/* Bouton Assistant existant */}
-                <Button
-                    variant={showChatbot ? "outline" : "default"}
-                    size="sm"
-                    onClick={() => setShowChatbot(!showChatbot)}
-                    className={`px-5 py-2.5 font-semibold text-sm transition-all duration-200 uppercase tracking-wide ${showChatbot
-                        ? "bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 shadow-sm hover:shadow-md"
-                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
-                    }`}
-                >
-                  {showChatbot ? "Fermer l'Assistant" : "Ouvrir l'Assistant"}
-                </Button>
               </div>
             </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open('./Simulateur/index.html', '_blank')}
+                className="px-6 py-2.5 font-medium text-sm border-[#18753c] text-[#18753c] hover:bg-[#18753c] hover:text-white"
+              >
+                Simulateur
+              </Button>
+              <Button
+                variant={showChatbot ? "outline" : "default"}
+                size="sm"
+                onClick={() => setShowChatbot(!showChatbot)}
+                className={`px-6 py-2.5 font-medium text-sm ${showChatbot
+                  ? "border-[#000091] text-[#000091] hover:bg-[#000091] hover:text-white"
+                  : "bg-[#000091] hover:bg-[#1212ff] text-white"
+                  }`}
+              >
+                {showChatbot ? "Fermer l'Assistant" : "Ouvrir l'Assistant"}
+              </Button>
+            </div>
           </div>
+        </div>
+      </header>
 
-          {/* Message de statut d'exportation */}
-          {exportStatus && !exportStatus.includes("...") && (
-              <div className="absolute top-20 right-6 bg-gray-800 text-white text-sm py-2 px-4 rounded shadow-lg">
-                {exportStatus}
-              </div>
-          )}
-        </header>
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Map Section */}
+        <div className="flex-1 relative">
+          <FluRiskMap
+            selectedDepartment={selectedDepartment}
+            onDepartmentClick={handleDepartmentClick}
+          />
+        </div>
 
-        {/* Main Content */}
-        <div className="flex h-[calc(100vh-80px)]">
-          {/* Map Section */}
-          <div className="flex-1 relative">
-            <FluRiskMap
-                selectedDepartment={selectedDepartment}
-                onDepartmentClick={handleDepartmentClick}
-            />
-          </div>
-
-          {/* Side Panel */}
-          <div className="w-96 bg-white border-l border-gray-200 shadow-lg transition-all duration-300 flex flex-col">
-            {showChatbot ? (
-                <div className="flex-1 overflow-hidden">
-                  <ChatBot />
-                </div>
-            ) : (
-                <div className="p-6 space-y-5 overflow-y-auto h-full bg-gray-50">
-                  <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="border-b border-gray-100">
-                      <CardTitle className="text-base text-gray-900 font-bold uppercase tracking-wider">
-                        Statistiques Nationales
-                      </CardTitle>
-                      <CardDescription className="text-xs text-gray-600 mt-1">
-                        Données de santé en temps réel
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-l-4 border-blue-600 shadow-sm hover:shadow-md transition-all">
-                          <CardContent className="p-4">
-                            <div>
-                              <h4 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">
-                                Départements
-                              </h4>
-                              <p className="text-3xl font-bold text-blue-900 mb-1">
-                                {stats ? stats.totalDepartments : "—"}
-                              </p>
-                              <p className="text-xs text-blue-600 font-medium">
-                                Analysés
-                              </p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-l-4 border-orange-600 shadow-sm hover:shadow-md transition-all">
-                          <CardContent className="p-4">
-                            <div>
-                              <h4 className="text-xs font-bold text-orange-700 uppercase tracking-wider mb-2">
-                                Risque Moyen
-                              </h4>
-                              <p className="text-3xl font-bold text-orange-900 mb-1">
-                                {stats ? stats.averageRiskScore.toFixed(2) : "—"}
-                              </p>
-                              <p className="text-xs text-orange-600 font-medium">
-                                Score national
-                              </p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-l-4 border-green-600 shadow-sm hover:shadow-md transition-all">
-                          <CardContent className="p-4">
-                            <div>
-                              <h4 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">
-                                Couverture Vaccinale
-                              </h4>
-                              <p className="text-3xl font-bold text-green-900 mb-1">
-                                {stats && stats.averageVaccinationCoverage
-                                    ? `${(stats.averageVaccinationCoverage * 100).toFixed(1)}%`
-                                    : "—"}
-                              </p>
-                              <p className="text-xs text-green-600 font-medium">
-                                Moyenne nationale
-                              </p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-red-50 to-red-100/50 border-l-4 border-red-600 shadow-sm hover:shadow-md transition-all">
-                          <CardContent className="p-4">
-                            <div>
-                              <h4 className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">
-                                Urgences
-                              </h4>
-                              <p className="text-3xl font-bold text-red-900 mb-1">
-                                {stats && stats.totalEmergencyVisits
-                                    ? stats.totalEmergencyVisits.toLocaleString()
-                                    : "—"}
-                              </p>
-                              <p className="text-xs text-red-600 font-medium">
-                                Visites hebdomadaires
-                              </p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {selectedDepartment && (
-                      <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                        <CardHeader className="border-b border-gray-100 pb-3">
-                          <CardTitle className="text-base text-gray-900 font-bold">
-                            {selectedDepartment.name}
-                          </CardTitle>
-                          <div className="flex items-center mt-1">
-                            <Badge
-                                variant={
-                                  selectedDepartment.riskLevel === "very-high"
-                                      ? "destructive"
-                                      : selectedDepartment.riskLevel === "high"
-                                          ? "secondary"
-                                          : selectedDepartment.riskLevel === "medium"
-                                              ? "outline"
-                                              : "default"
-                                }
-                                className="text-xs mr-2"
-                            >
-                              {selectedDepartment.riskLevel === "very-high"
-                                  ? "Très Élevé"
-                                  : selectedDepartment.riskLevel === "high"
-                                      ? "Élevé"
-                                      : selectedDepartment.riskLevel === "medium"
-                                          ? "Moyen"
-                                          : "Faible"}
-                            </Badge>
-                            <span className="text-xs text-gray-600">
-                        Score: {selectedDepartment.riskScore.toFixed(1)}
-                      </span>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pt-4 space-y-4">
-                          <div>
-                            <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">
-                          Couverture Vaccinale:
-                        </span>
-                              <span className="font-mono text-sm">
-                          {selectedDepartment.vaccinationCoverage
-                              ? `${(selectedDepartment.vaccinationCoverage * 100).toFixed(1)}%`
+        {/* Side Panel */}
+        <div className="w-96 bg-white border-l border-gray-200 shadow-sm transition-all duration-300 flex flex-col min-h-full">
+          {showChatbot ? (
+            <div className="flex-1 min-h-0">
+              <ChatBot />
+            </div>
+          ) : (
+            <div className="p-6 space-y-6 overflow-y-auto h-full bg-gray-50">
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="border-b border-gray-200 bg-gray-50">
+                  <CardTitle className="text-lg text-[#161616] font-bold">
+                    Statistiques Nationales
+                  </CardTitle>
+                  <CardDescription className="text-sm text-[#666666] mt-1">
+                    Données de santé en temps réel
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="bg-white border border-gray-200">
+                      <CardContent className="p-5">
+                        <div>
+                          <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider mb-3">
+                            Départements
+                          </h4>
+                          <p className="text-3xl font-bold text-[#161616] mb-2">
+                            {stats ? stats.totalDepartments : "—"}
+                          </p>
+                          <p className="text-xs text-[#666666] font-medium">
+                            Analysés
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-white border border-gray-200">
+                      <CardContent className="p-5">
+                        <div>
+                          <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider mb-3">
+                            Risque Moyen
+                          </h4>
+                          <p className="text-3xl font-bold text-[#161616] mb-2">
+                            {stats ? stats.averageRiskScore.toFixed(2) : "—"}
+                          </p>
+                          <p className="text-xs text-[#666666] font-medium">
+                            Score national
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-white border border-gray-200">
+                      <CardContent className="p-5">
+                        <div>
+                          <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider mb-3">
+                            Vaccination
+                          </h4>
+                          <p className="text-3xl font-bold text-[#161616] mb-2">
+                            {stats && stats.averageVaccinationCoverage
+                              ? `${(
+                                stats.averageVaccinationCoverage * 100
+                              ).toFixed(0)}%`
                               : "—"}
-                        </span>
-                            </div>
-                            <Progress
-                                value={
-                                  selectedDepartment.vaccinationCoverage
-                                      ? selectedDepartment.vaccinationCoverage * 100
-                                      : 0
-                                }
-                                className="h-2 bg-gray-100"
-                            />
-                          </div>
+                          </p>
+                          <p className="text-xs text-[#666666] font-medium">
+                            Couverture moyenne
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-white border border-gray-200">
+                      <CardContent className="p-5">
+                        <div>
+                          <h4 className="text-xs font-bold text-[#666666] uppercase tracking-wider mb-3">
+                            Urgences
+                          </h4>
+                          <p className="text-3xl font-bold text-[#161616] mb-2">
+                            {stats &&
+                              typeof stats.totalEmergencyVisits === "number"
+                              ? stats.totalEmergencyVisits.toLocaleString()
+                              : "—"}
+                          </p>
+                          <p className="text-xs text-[#666666] font-medium">
+                            Visites totales
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
-                          {selectedDepartment.vaccinationCoverage && (
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center">
+              {/* Export Section */}
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="border-b border-gray-200 bg-gray-50">
+                  <CardTitle className="text-lg text-[#161616] font-bold">
+                    Export des Données
+                  </CardTitle>
+                  <CardDescription className="text-sm text-[#666666] mt-1">
+                    Téléchargez les données au format CSV
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      onClick={exportVaccinationData}
+                      className="w-full border border-[#18753c] text-[#18753c] hover:bg-[#18753c] hover:text-white font-medium disabled:opacity-50"
+                      disabled={!!exportStatus}
+                    >
+                      {exportStatus && exportStatus.includes("vaccination") ? (
+                        <>
+                          <span className="animate-spin inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                          Exportation...
+                        </>
+                      ) : (
+                        <>📊 Export Vaccination</>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      onClick={exportIncidenceData}
+                      className="w-full border border-[#d64d00] text-[#d64d00] hover:bg-[#d64d00] hover:text-white font-medium disabled:opacity-50"
+                      disabled={!!exportStatus}
+                    >
+                      {exportStatus && exportStatus.includes("incidence") ? (
+                        <>
+                          <span className="animate-spin inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                          Exportation...
+                        </>
+                      ) : (
+                        <>📈 Export Incidence</>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      onClick={exportCombinedData}
+                      className="w-full border border-[#6a6af4] text-[#6a6af4] hover:bg-[#6a6af4] hover:text-white font-medium disabled:opacity-50"
+                      disabled={!!exportStatus}
+                    >
+                      {exportStatus && exportStatus.includes("combinées") ? (
+                        <>
+                          <span className="animate-spin inline-block w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                          Exportation...
+                        </>
+                      ) : (
+                        <>📋 Export Données Complètes</>
+                      )}
+                    </Button>
+
+                    {exportStatus && !exportStatus.includes("...") && (
+                      <div className="text-sm text-green-600 font-medium text-center mt-2">
+                        {exportStatus}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {statsError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{statsError}</AlertDescription>
+                </Alert>
+              )}
+
+              {selectedDepartment && (
+                <Card className="bg-white border border-gray-200 shadow-sm">
+                  <CardHeader className="border-b border-gray-200 bg-gray-50">
+                    <CardTitle className="text-lg text-[#161616] font-bold">
+                      {selectedDepartment.name}
+                    </CardTitle>
+                    <CardDescription className="text-[#666666] text-sm uppercase tracking-wide font-semibold">
+                      Département {selectedDepartment.code}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-5 p-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Niveau de Risque :</span>
+                      <Badge
+                        variant={
+                          selectedDepartment.riskLevel === "high"
+                            ? "destructive"
+                            : selectedDepartment.riskLevel === "medium"
+                              ? "secondary"
+                              : "default"
+                        }
+                        className="text-xs"
+                      >
+                        {selectedDepartment.riskLevel}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Score de Risque :</span>
+                        <span className="font-mono text-sm">
+                          {selectedDepartment.riskScore}
+                        </span>
+                        <span className="font-mono text-sm">
+                          {selectedDepartment.vaccinationCoverage
+                            ? `${(selectedDepartment.vaccinationCoverage * 100).toFixed(1)}%`
+                            : "—"}
+                        </span>
+                      </div>
+                      <Progress
+                        value={
+                          selectedDepartment.vaccinationCoverage
+                            ? selectedDepartment.vaccinationCoverage * 100
+                            : 0
+                        }
+                        className="h-2 bg-gray-100"
+                      />
+                    </div>
+
+                    {selectedDepartment.vaccinationCoverage && (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
                           <span className="text-sm font-medium">
                             Couverture Vaccinale Globale :
                           </span>
-                                  <span className="font-mono text-sm">
+                          <span className="font-mono text-sm">
                             {(
-                                selectedDepartment.vaccinationCoverage * 100
+                              selectedDepartment.vaccinationCoverage * 100
                             ).toFixed(1)}
-                                    %
+                            %
                           </span>
-                                </div>
-                                {selectedDepartment.fluCoverage && (
-                                    <div className="flex justify-between items-center">
+                        </div>
+                        {selectedDepartment.fluCoverage && (
+                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-blue-700">
                               Vaccination Grippe :
                             </span>
-                                      <span className="font-mono text-sm text-blue-600">
+                            <span className="font-mono text-sm text-blue-600">
                               {(selectedDepartment.fluCoverage * 100).toFixed(1)}%
                             </span>
-                                    </div>
-                                )}
-                                {selectedDepartment.covidCoverage && (
-                                    <div className="flex justify-between items-center">
+                          </div>
+                        )}
+                        {selectedDepartment.covidCoverage && (
+                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-green-700">
                               Vaccination COVID-19 :
                             </span>
-                                      <span className="font-mono text-sm text-green-600">
+                            <span className="font-mono text-sm text-green-600">
                               {(selectedDepartment.covidCoverage * 100).toFixed(1)}%
                             </span>
-                                    </div>
-                                )}
-                                {selectedDepartment.hpvCoverage && (
-                                    <div className="flex justify-between items-center">
+                          </div>
+                        )}
+                        {selectedDepartment.hpvCoverage && (
+                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-purple-700">
                               Vaccination HPV :
                             </span>
-                                      <span className="font-mono text-sm text-purple-600">
+                            <span className="font-mono text-sm text-purple-600">
                               {(selectedDepartment.hpvCoverage * 100).toFixed(1)}%
                             </span>
-                                    </div>
-                                )}
-                                {selectedDepartment.meningococcalCoverage && (
-                                    <div className="flex justify-between items-center">
+                          </div>
+                        )}
+                        {selectedDepartment.meningococcalCoverage && (
+                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-orange-700">
                               Vaccination Méningocoque C :
                             </span>
-                                      <span className="font-mono text-sm text-orange-600">
+                            <span className="font-mono text-sm text-orange-600">
                               {(selectedDepartment.meningococcalCoverage * 100).toFixed(1)}%
                             </span>
-                                    </div>
-                                )}
-                                {selectedDepartment.vaccinationRiskLevel && (
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-sm font-medium">Risque Vaccinal :</span>
-                                      <Badge
-                                          variant={
-                                            selectedDepartment.vaccinationRiskLevel === "very-high"
-                                                ? "destructive"
-                                                : selectedDepartment.vaccinationRiskLevel === "high"
-                                                    ? "secondary"
-                                                    : selectedDepartment.vaccinationRiskLevel === "medium"
-                                                        ? "outline"
-                                                        : "default"
-                                          }
-                                          className="text-xs"
-                                      >
-                                        {selectedDepartment.vaccinationRiskLevel === "very-high" ? "Très Élevé" :
-                                            selectedDepartment.vaccinationRiskLevel === "high" ? "Élevé" :
-                                                selectedDepartment.vaccinationRiskLevel === "medium" ? "Moyen" : "Faible"}
-                                      </Badge>
-                                    </div>
-                                )}
-                              </div>
-                          )}
-                          {selectedDepartment.emergencyVisits && (
-                              <div className="flex justify-between items-center">
+                          </div>
+                        )}
+                        {selectedDepartment.vaccinationRiskLevel && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Risque Vaccinal :</span>
+                            <Badge
+                              variant={
+                                selectedDepartment.vaccinationRiskLevel === "very-high"
+                                  ? "destructive"
+                                  : selectedDepartment.vaccinationRiskLevel === "high"
+                                    ? "secondary"
+                                    : selectedDepartment.vaccinationRiskLevel === "medium"
+                                      ? "outline"
+                                      : "default"
+                              }
+                              className="text-xs"
+                            >
+                              {selectedDepartment.vaccinationRiskLevel === "very-high" ? "Très Élevé" :
+                                selectedDepartment.vaccinationRiskLevel === "high" ? "Élevé" :
+                                  selectedDepartment.vaccinationRiskLevel === "medium" ? "Moyen" : "Faible"}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {selectedDepartment.emergencyVisits && (
+                      <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">
                           Visites d'Urgence :
                         </span>
-                                <span className="font-mono text-sm">
+                        <span className="font-mono text-sm">
                           {selectedDepartment.emergencyVisits}
                         </span>
-                              </div>
-                          )}
-                          {selectedDepartment.sosMedecinsActs && (
-                              <div className="flex justify-between items-center">
+                      </div>
+                    )}
+                    {selectedDepartment.sosMedecinsActs && (
+                      <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">
                           Actes SOS Médecins :
                         </span>
-                                <span className="font-mono text-sm">
+                        <span className="font-mono text-sm">
                           {selectedDepartment.sosMedecinsActs}
                         </span>
-                              </div>
-                          )}
-                          {selectedDepartment.population && (
-                              <div className="flex justify-between items-center">
+                      </div>
+                    )}
+                    {selectedDepartment.population && (
+                      <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">
                           Population :
                         </span>
-                                <span className="font-mono text-sm">
+                        <span className="font-mono text-sm">
                           {selectedDepartment.population.toLocaleString()}
                         </span>
-                              </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                  )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
-                  <Card className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="border-b border-gray-100">
-                      <CardTitle className="text-base text-gray-900 font-bold uppercase tracking-wider">
-                        Guide d'Utilisation
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <ul className="space-y-3 text-sm text-gray-700">
-                        <li className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-white border-l-4 border-blue-500 hover:shadow-sm transition-all">
-                          <span className="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                          <span className="leading-relaxed font-medium">Cliquez sur les marqueurs pour voir les données détaillées</span>
-                        </li>
-                        <li className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-r from-green-50 to-white border-l-4 border-green-500 hover:shadow-sm transition-all">
-                          <span className="w-6 h-6 bg-green-600 text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                          <span className="leading-relaxed font-medium">Utilisez les outils de dessin pour créer des zones personnalisées</span>
-                        </li>
-                        <li className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-r from-purple-50 to-white border-l-4 border-purple-500 hover:shadow-sm transition-all">
-                          <span className="w-6 h-6 bg-purple-600 text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                          <span className="leading-relaxed font-medium">Consultez l'assistant IA pour des analyses et prédictions</span>
-                        </li>
-                        <li className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-r from-orange-50 to-white border-l-4 border-orange-500 hover:shadow-sm transition-all">
-                          <span className="w-6 h-6 bg-orange-600 text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
-                          <span className="leading-relaxed font-medium">Modifiez les formes dessinées selon vos besoins</span>
-                        </li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </div>
-            )}
-          </div>
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader className="border-b border-gray-200 bg-gray-50">
+                  <CardTitle className="text-lg text-[#161616] font-bold uppercase tracking-wider">
+                    Guide d'Utilisation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <ul className="space-y-3 text-sm text-[#161616]">
+                    <li className="flex items-start gap-3 p-3 border-l-4 border-[#000091]">
+                      <span className="w-6 h-6 bg-[#000091] text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                      <span className="leading-relaxed font-medium">Cliquez sur les départements pour voir les données détaillées</span>
+                    </li>
+                    <li className="flex items-start gap-3 p-3 border-l-4 border-[#18753c]">
+                      <span className="w-6 h-6 bg-[#18753c] text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                      <span className="leading-relaxed font-medium">Utilisez les outils de dessin pour créer des zones personnalisées</span>
+                    </li>
+                    <li className="flex items-start gap-3 p-3 border-l-4 border-[#6a6af4]">
+                      <span className="w-6 h-6 bg-[#6a6af4] text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                      <span className="leading-relaxed font-medium">Consultez l'assistant IA pour des analyses et prédictions</span>
+                    </li>
+                    <li className="flex items-start gap-3 p-3 border-l-4 border-[#d64d00]">
+                      <span className="w-6 h-6 bg-[#d64d00] text-white rounded flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                      <span className="leading-relaxed font-medium">Modifiez les formes dessinées selon vos besoins</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Footer */}
-        <footer className="border-t border-gray-200 bg-white py-3">
-          <div className="container mx-auto px-6">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-gray-600">
-                <span className="font-medium text-gray-700">Source:</span> Données ouvertes du gouvernement français
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-600">
-                <span>Propulsé par</span>
-                <span className="font-semibold text-blue-600">OpenStreetMap</span>
-                <span className="text-gray-400">&</span>
-                <span className="font-semibold text-blue-600">Geoman.io</span>
-              </div>
+      {/* Footer */}
+      <footer className="border-t border-gray-200 bg-white py-3">
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-600">
+              <span className="font-medium text-gray-700">Source:</span> Données ouvertes du gouvernement français
+            </p>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <span>Propulsé par</span>
+              <span className="font-semibold text-blue-600">OpenStreetMap</span>
+              <span className="text-gray-400">&</span>
+              <span className="font-semibold text-blue-600">Geoman.io</span>
             </div>
           </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
+    </div>
   );
 }
 

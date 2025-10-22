@@ -182,10 +182,16 @@ function DepartmentsChoropleth({ departments }: { departments: Department[] }) {
           if (d) {
             // Flu risk data (from sentiweb_data.csv)
             const fluData = `
-              <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
-                <h4 style="margin: 0 0 8px 0; color: #2c3e50;">🦠 Flu Risk Data</h4>
-                <p style="margin: 2px 0;"><strong>Risk Level:</strong> ${(d as any).riskLevel}</p>
-                <p style="margin: 2px 0;"><strong>Risk Score:</strong> ${((d as any).riskScore * 100).toFixed(1)}%</p>
+              <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">
+                <h4 style="margin: 0 0 8px 0; color: #1f2937; font-weight: 600; font-size: 14px;">Risque Grippal</h4>
+                <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                  <span style="color: #6b7280; font-size: 12px;">Niveau de risque:</span>
+                  <span style="font-weight: 600; color: #1f2937; font-size: 12px;">${(d as any).riskLevel}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                  <span style="color: #6b7280; font-size: 12px;">Score de risque:</span>
+                  <span style="font-weight: 600; color: #1f2937; font-size: 12px;">${((d as any).riskScore * 100).toFixed(1)}%</span>
+                </div>
               </div>
             `;
 
@@ -197,17 +203,23 @@ function DepartmentsChoropleth({ departments }: { departments: Department[] }) {
             const vaccinationData = fluVacc
               ? `
                 <div style="margin-bottom: 15px;">
-                  <h4 style="margin: 0 0 8px 0; color: #27ae60;">💉 Vaccination Coverage</h4>
-                  <p style="margin: 2px 0;"><strong>Flu Vaccination:</strong> ${fluVacc}</p>
+                  <h4 style="margin: 0 0 8px 0; color: #059669; font-weight: 600; font-size: 14px;">Couverture Vaccinale</h4>
+                  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                    <span style="color: #6b7280; font-size: 12px;">Vaccination grippe:</span>
+                    <span style="font-weight: 600; color: #059669; font-size: 12px;">${fluVacc}</span>
+                  </div>
                 </div>
               `
               : "";
 
             layer.bindPopup(`
-              <div>
-                <h3>${name} (${code})</h3>
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 280px;">
+                <h3 style="margin: 0 0 12px 0; color: #1f2937; font-weight: 700; font-size: 16px; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">${name} (${code})</h3>
                 ${fluData}
                 ${vaccinationData}
+                <div style="text-align: center; margin-top: 12px;">
+                  <span style="color: #6b7280; font-size: 11px; font-style: italic;">Cliquez pour zoomer sur ce département</span>
+                </div>
               </div>
             `);
           } else {
@@ -502,54 +514,53 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
       </MapContainer>
 
       {/* Compact Legend */}
-      <Card className="absolute top-4 right-4 z-[1000] w-48 bg-white/95 backdrop-blur-sm shadow-lg border-gray-200">
-        <CardHeader className="pb-2 pt-2 border-b border-gray-100">
-          <CardTitle className="text-xs text-gray-900 font-bold uppercase tracking-wide">
+      <Card className="absolute top-4 right-4 z-[1000] w-48 bg-white shadow-sm border border-gray-200">
+        <CardHeader className="pb-2 pt-2 border-b border-gray-200 bg-gray-50">
+          <CardTitle className="text-sm text-[#161616] font-bold">
             Légende Risque
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 pb-3 pt-2">
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-green-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#2E7D32" }}></div>
-            <span className="text-xs text-gray-800 font-medium">Très Faible (&lt;30%)</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#2E7D32]"></div>
+            <span className="text-xs text-[#161616] font-medium">Très Faible (&lt;30%)</span>
           </div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-green-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#4CAF50" }}></div>
-            <span className="text-xs text-gray-800 font-medium">Faible (30-35%)</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#4CAF50]"></div>
+            <span className="text-xs text-[#161616] font-medium">Faible (30-35%)</span>
           </div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-lime-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#8BC34A" }}></div>
-            <span className="text-xs text-gray-800 font-medium">Moyen-Bas (35-40%)</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#8BC34A]"></div>
+            <span className="text-xs text-[#161616] font-medium">Moyen-Bas (35-40%)</span>
           </div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-yellow-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#FFC107" }}></div>
-            <span className="text-xs text-gray-800 font-medium">Moyen-Haut (40-45%)</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#FFC107]"></div>
+            <span className="text-xs text-[#161616] font-medium">Moyen-Haut (40-45%)</span>
           </div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-orange-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#FF9800" }}></div>
-            <span className="text-xs text-gray-800 font-medium">Élevé (≥45%)</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#FF9800]"></div>
+            <span className="text-xs text-[#161616] font-medium">Élevé (≥45%)</span>
           </div>
           <div className="h-px bg-gray-200 my-1"></div>
-          <div className="flex items-center gap-2 p-1 rounded hover:bg-blue-50 transition-colors cursor-default">
-            <div className="w-3 h-3 rounded-full bg-blue-500 border border-gray-700 shadow-sm"></div>
-            <span className="text-xs text-gray-800 font-medium">TOM</span>
+          <div className="flex items-center gap-2 p-1">
+            <div className="w-3 h-3 rounded-full bg-[#6a6af4]"></div>
+            <span className="text-xs text-[#161616] font-medium">TOM</span>
           </div>
         </CardContent>
       </Card>
 
       {/* Professional Navigation Control */}
       <div className="absolute bottom-4 right-4 z-[1000]">
-        <Card className="bg-white/95 backdrop-blur-sm shadow-lg border-gray-200">
-          <CardHeader className="pb-2 pt-3 border-b border-gray-100">
-            <CardTitle className="text-xs text-gray-900 font-bold uppercase tracking-wide">
+        <Card className="bg-white shadow-sm border border-gray-200">
+          <CardHeader className="pb-2 pt-3 border-b border-gray-200 bg-gray-50">
+            <CardTitle className="text-sm text-[#161616] font-bold">
               Navigation Rapide
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-3 pb-3">
             <div className="flex flex-col gap-2">
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 onClick={() => {
                   if (mapInstance) {
                     // Reset to Metropolitan France
@@ -562,13 +573,12 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
                     mapInstance.fitBounds(metropolitanBounds);
                   }
                 }}
-                className="bg-white border border-blue-200 hover:bg-blue-600 hover:text-white text-xs h-7 px-3 text-gray-800 font-semibold transition-all duration-200 justify-start"
+                className="border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white text-sm py-2 px-4 font-medium justify-start"
               >
                 France Métropolitaine
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 onClick={() => {
                   if (mapInstance) {
                     // Unlock bounds and go to Caribbean
@@ -581,13 +591,12 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
                     mapInstance.fitBounds(caribbeanBounds);
                   }
                 }}
-                className="bg-white border border-green-200 hover:bg-green-600 hover:text-white text-xs h-7 px-3 text-gray-800 font-semibold transition-all duration-200 justify-start"
+                className="border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white text-sm py-2 px-4 font-medium justify-start"
               >
                 Caraïbes
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 onClick={() => {
                   if (mapInstance) {
                     // Unlock bounds and go to Indian Ocean
@@ -600,13 +609,12 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
                     mapInstance.fitBounds(indianBounds);
                   }
                 }}
-                className="bg-white border border-purple-200 hover:bg-purple-600 hover:text-white text-xs h-7 px-3 text-gray-800 font-semibold transition-all duration-200 justify-start"
+                className="border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white text-sm py-2 px-4 font-medium justify-start"
               >
                 Océan Indien
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 onClick={() => {
                   if (mapInstance) {
                     // Unlock bounds and go to Pacific
@@ -619,7 +627,7 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
                     mapInstance.fitBounds(pacificBounds);
                   }
                 }}
-                className="bg-white border border-cyan-200 hover:bg-cyan-600 hover:text-white text-xs h-7 px-3 text-gray-800 font-semibold transition-all duration-200 justify-start"
+                className="border border-gray-300 text-[#161616] hover:bg-[#000091] hover:text-white text-sm py-2 px-4 font-medium justify-start"
               >
                 Pacifique
               </Button>
@@ -629,17 +637,17 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
       </div>
 
       {/* Professional Drawing Tools Panel */}
-      <Card className="absolute bottom-4 left-4 z-[1000] w-64 bg-white/95 backdrop-blur-sm shadow-lg border-gray-200">
-        <CardHeader className="py-3 border-b border-gray-100">
+      <Card className="absolute bottom-4 left-4 z-[1000] w-64 bg-white shadow-sm border border-gray-200">
+        <CardHeader className="py-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xs text-gray-900 font-bold uppercase tracking-wide">
+            <CardTitle className="text-sm text-[#161616] font-bold">
               Outils de Cartographie
             </CardTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsControlsOpen(!isControlsOpen)}
-              className="h-5 w-5 p-0 hover:bg-gray-100 text-gray-700 font-bold transition-colors text-sm"
+              className="h-6 w-6 p-0 hover:bg-gray-100 text-[#666666] font-bold transition-colors text-base"
             >
               {isControlsOpen ? "−" : "+"}
             </Button>
@@ -649,45 +657,45 @@ function FluRiskMap({ onDepartmentClick }: FluRiskMapProps) {
         {isControlsOpen && (
           <CardContent className="pt-3 pb-3">
             <div className="space-y-2">
-              <div className="flex items-center gap-3 p-2 rounded hover:bg-blue-50 transition-colors border-l-2 border-transparent hover:border-blue-500 cursor-default">
-                <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2 border-l-2 border-[#000091]">
+                <div className="w-5 h-5 bg-[#000091] rounded flex items-center justify-center">
                   <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21L3 17l4-4m0 8l6.5-6.5m0 0L17 21l4-4-3-3M10.5 14.5L3 7l4-4 3.5 3.5" />
                   </svg>
                 </div>
-                <span className="text-xs text-gray-700 font-semibold">Polygone</span>
+                <span className="text-sm text-[#161616] font-medium">Polygone</span>
               </div>
-              <div className="flex items-center gap-3 p-2 rounded hover:bg-green-50 transition-colors border-l-2 border-transparent hover:border-green-500 cursor-default">
-                <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2 border-l-2 border-[#18753c]">
+                <div className="w-5 h-5 bg-[#18753c] rounded-full flex items-center justify-center">
                   <div className="w-2 h-2 border-2 border-white rounded-full"></div>
                 </div>
-                <span className="text-xs text-gray-700 font-semibold">Cercle</span>
+                <span className="text-sm text-[#161616] font-medium">Cercle</span>
               </div>
-              <div className="flex items-center gap-3 p-2 rounded hover:bg-orange-50 transition-colors border-l-2 border-transparent hover:border-orange-500 cursor-default">
-                <div className="w-5 h-5 bg-orange-600 rounded flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2 border-l-2 border-[#d64d00]">
+                <div className="w-5 h-5 bg-[#d64d00] rounded flex items-center justify-center">
                   <div className="w-3 h-2 border border-white"></div>
                 </div>
-                <span className="text-xs text-gray-700 font-semibold">Rectangle</span>
+                <span className="text-sm text-[#161616] font-medium">Rectangle</span>
               </div>
-              <div className="flex items-center gap-3 p-2 rounded hover:bg-purple-50 transition-colors border-l-2 border-transparent hover:border-purple-500 cursor-default">
-                <div className="w-5 h-5 bg-purple-600 rounded flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2 border-l-2 border-[#6a6af4]">
+                <div className="w-5 h-5 bg-[#6a6af4] rounded flex items-center justify-center">
                   <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </div>
-                <span className="text-xs text-gray-700 font-semibold">Modifier</span>
+                <span className="text-sm text-[#161616] font-medium">Modifier</span>
               </div>
-              <div className="flex items-center gap-3 p-2 rounded hover:bg-red-50 transition-colors border-l-2 border-transparent hover:border-red-500 cursor-default">
-                <div className="w-5 h-5 bg-red-600 rounded flex items-center justify-center">
+              <div className="flex items-center gap-3 p-2 border-l-2 border-[#d64d00]">
+                <div className="w-5 h-5 bg-[#d64d00] rounded flex items-center justify-center">
                   <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>
-                <span className="text-xs text-gray-700 font-semibold">Supprimer</span>
+                <span className="text-sm text-[#161616] font-medium">Supprimer</span>
               </div>
             </div>
-            <div className="mt-3 p-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded">
-              <p className="text-xs text-gray-600 text-center font-medium">
+            <div className="mt-3 p-2 bg-gray-50 border border-gray-200 rounded">
+              <p className="text-sm text-[#666666] text-center font-medium">
                 Contrôles visibles en haut à gauche
               </p>
             </div>
