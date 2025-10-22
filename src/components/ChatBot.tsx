@@ -9,13 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 
 function ChatBot() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Bonjour ! Je suis votre assistant d'analyse du risque de grippe. Demandez-moi des informations sur la couverture vaccinale, les niveaux de risque ou les prédictions pour n'importe quel département français.",
+      text: "🤖 **Assistant IA Prédictive** - Bonjour ! Je suis spécialisé dans l'analyse du risque de grippe en France. Grâce à mon entraînement sur 5 ans de données épidémiologiques, je peux vous fournir des analyses actuelles et des **prédictions pour les années futures**. Demandez-moi des informations sur la couverture vaccinale, les niveaux de risque ou les tendances à venir !",
       sender: "bot",
       timestamp: new Date().toISOString(),
     },
@@ -85,10 +86,10 @@ function ChatBot() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base font-bold text-gray-900 uppercase tracking-wide">
-                Assistant Analytique
+                🤖 Assistant IA Prédictive
               </CardTitle>
               <p className="text-xs text-gray-600 mt-1 font-medium">
-                Intelligence artificielle pour l'analyse épidémiologique
+                Analyse épidémiologique & prédictions grippales
               </p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-md">
@@ -219,7 +220,7 @@ function ChatBot() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Demandez des informations sur les données de risque de grippe..."
+                placeholder="Demandez des analyses actuelles ou des prédictions pour 2026..."
                 rows={2}
                 disabled={isLoading}
                 className="flex-1 resize-none border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl text-gray-800 placeholder:text-gray-400"
@@ -235,7 +236,12 @@ function ChatBot() {
             </div>
 
             <div className="space-y-2 border-t border-gray-200 pt-3">
-              <p className="text-xs text-gray-600 font-bold uppercase tracking-wide">Requêtes Suggérées</p>
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-xs text-gray-600 font-bold uppercase tracking-wide">Requêtes Suggérées</p>
+                <Badge variant="secondary" className="text-xs bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 border-purple-200">
+                  🤖 IA Prédictive
+                </Badge>
+              </div>
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
@@ -263,11 +269,21 @@ function ChatBot() {
                   variant="outline"
                   size="sm"
                   onClick={() =>
-                    setInputMessage("Prédisez les tendances du risque de grippe pour la prochaine saison")
+                    setInputMessage("Quelle sera la tendance grippale pour 2026 ?")
                   }
                   className="text-xs border-purple-300 text-purple-700 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all duration-200 font-semibold"
                 >
-                  Prédictions
+                  🔮 Prédictions 2026
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setInputMessage("Comment évoluera le risque grippal dans les années à venir ?")
+                  }
+                  className="text-xs border-orange-300 text-orange-700 hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-200 font-semibold"
+                >
+                  📈 Tendances futures
                 </Button>
               </div>
             </div>

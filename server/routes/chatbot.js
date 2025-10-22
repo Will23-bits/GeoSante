@@ -1,62 +1,91 @@
 const express = require("express");
 const router = express.Router();
-const { spawn } = require("child_process");
 const { processData } = require("../data/fetchData");
 const VaccinationDataParser = require("../data/vaccinationData");
+const fs = require("fs");
+const path = require("path");
+
+// Load environment variables from .env file
+function loadEnv() {
+  try {
+    const envPath = path.join(process.cwd(), ".env");
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, "utf8");
+      const lines = envContent.split("\n");
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith("#")) {
+          const [key, ...valueParts] = trimmed.split("=");
+          if (key && valueParts.length > 0) {
+            const value = valueParts.join("=").replace(/^["']|["']$/g, "");
+            process.env[key.trim()] = value.trim();
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.warn("Could not load .env file:", error.message);
+  }
+}
+
+// Load environment variables
+loadEnv();
 
 // Initialize vaccination data parser
 const vaccinationParser = new VaccinationDataParser();
 
-// Ollama configuration for local AI inference
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.2:3b";
+// OpenAI fine-tuned model (default and only option)
+const OPENAI_MODEL = process.env.FINE_TUNED_MODEL || "gpt-3.5-turbo"; // Use fine-tuned model if available
+
+// Initialize OpenAI client (required)
+let openai = null;
+try {
+  const OpenAI = require("openai");
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+} catch (error) {
+  console.error(
+    "OpenAI package not installed or API key missing. Install with: npm install openai"
+  );
+  process.exit(1);
+}
+
+// Note: Ollama removed - use OpenAI for fine-tuning
+// Mistral setup available in MISTRAL_SETUP.md for future use
 
 /**
- * Query Ollama model locally
+ * Query OpenAI model (including fine-tuned models)
  */
-async function queryOllama(message, knowledgeBase) {
-  return new Promise((resolve, reject) => {
-    const systemPrompt = `Vous êtes un assistant spécialisé dans l'analyse des données de santé publique française, particulièrement les risques de grippe et la couverture vaccinale par département. Vous répondez uniquement en français et utilisez les données exactes fournies.
+async function queryOpenAI(message, knowledgeBase) {
+  if (!openai) {
+    throw new Error("OpenAI client not initialized");
+  }
+
+  const systemPrompt = `Vous êtes un assistant spécialisé dans l'analyse des données de santé publique française, particulièrement les risques de grippe et la couverture vaccinale par département. Vous répondez uniquement en français et utilisez les données exactes fournies.
 
 Données disponibles: ${JSON.stringify(knowledgeBase, null, 2)}
 
 Répondez en français, soyez précis et utilisez les données fournies.`;
 
-    const fullPrompt = `${systemPrompt}\n\nQuestion: ${message}\n\nRéponse:`;
-
-    const ollama = spawn("ollama", ["run", OLLAMA_MODEL, fullPrompt]);
-
-    let response = "";
-    let errorOutput = "";
-
-    ollama.stdout.on("data", (data) => {
-      response += data.toString();
-    });
-
-    ollama.stderr.on("data", (data) => {
-      errorOutput += data.toString();
-    });
-
-    ollama.on("close", (code) => {
-      if (code === 0) {
-        resolve(response.trim());
-      } else {
-        console.error("Ollama error:", errorOutput);
-        reject(
-          new Error(`Ollama process exited with code ${code}: ${errorOutput}`)
-        );
-      }
-    });
-
-    ollama.on("error", (error) => {
-      reject(error);
-    });
-
-    // Timeout after 30 seconds
-    setTimeout(() => {
-      ollama.kill();
-      reject(new Error("Ollama query timeout"));
-    }, 30000);
+  const response = await openai.chat.completions.create({
+    model: OPENAI_MODEL,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: message,
+      },
+    ],
+    max_tokens: 500,
+    temperature: 0.7,
   });
+
+  return response.choices[0].message.content;
 }
 
 // RAG knowledge base from real Sentiweb data + vaccination data
@@ -281,7 +310,7 @@ Note: Les données proviennent des APIs officielles avec système de rate limiti
 `;
 }
 
-// POST /api/chat - Chat with Ollama about flu risk data
+// POST /api/chat - Chat with OpenAI fine-tuned model about flu risk data
 router.post("/", async (req, res) => {
   try {
     const { message } = req.body;
@@ -292,16 +321,22 @@ router.post("/", async (req, res) => {
 
     const knowledgeBase = await buildKnowledgeBase();
 
-    // Use local Ollama model
-    console.log(`🤖 Using Ollama model: ${OLLAMA_MODEL}`);
+    // Use OpenAI (including fine-tuned models)
+    if (!openai) {
+      return res.status(500).json({
+        error: "OpenAI client not initialized. Check OPENAI_API_KEY",
+        details: "Install OpenAI package with: npm install openai",
+      });
+    }
 
-    const response = await queryOllama(message, knowledgeBase);
+    console.log(`🤖 Using OpenAI model: ${OPENAI_MODEL}`);
+    const response = await queryOpenAI(message, knowledgeBase);
 
     res.json({
       response: response,
       timestamp: new Date().toISOString(),
-      model: OLLAMA_MODEL,
-      provider: "ollama",
+      model: OPENAI_MODEL,
+      provider: "openai",
     });
   } catch (error) {
     console.error("Error in chatbot:", error);
